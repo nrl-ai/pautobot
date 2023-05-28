@@ -1,0 +1,7 @@
+.next
+node_modules
+.DS_Store
+*.pyc
+pauto-backend/db
+pauto-backend/models
+pauto-backend/migrations
