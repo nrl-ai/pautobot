@@ -5,11 +5,11 @@ export default function NewMessage({ onSubmitMessage }) {
 
   return (
     <>
-      <form className="w-full">
+      <form className="w-full px-2">
         <label htmlFor="chat" className="sr-only">
           Your message
         </label>
-        <div className="flex items-center bg-gray-300 p-2">
+        <div className="flex items-center bg-gray-300 px-2 pt-4 rounded-t-2xl overflow-hidden pb-8">
           <button
             type="button"
             className="inline-flex justify-center p-2 text-gray-500 rounded-lg cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600"
@@ -31,13 +31,14 @@ export default function NewMessage({ onSubmitMessage }) {
           </button>
           <textarea
             rows="2"
-            className="block mx-4 p-2.5 w-full text-lg text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-gray-500 focus:border-gray-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-gray-500 dark:focus:border-gray-500"
+            className="block mx-4 p-2.5 w-full text-lg text-gray-900 bg-gray-50 rounded-2xl border border-gray-300 focus:ring-gray-500 focus:border-gray-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-gray-500 dark:focus:border-gray-500"
             placeholder="What are you thinking about?..."
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
+                if (!message) return;
                 onSubmitMessage(message);
                 setMessage("");
               }
@@ -48,6 +49,7 @@ export default function NewMessage({ onSubmitMessage }) {
             className="inline-flex justify-center p-2 text-gray-600 rounded-full cursor-pointer hover:bg-blue-100 dark:text-gray-500 dark:hover:bg-gray-600"
             onClick={(e) => {
               e.preventDefault();
+              if (!message) return;
               onSubmitMessage(message);
               setMessage("");
             }}
