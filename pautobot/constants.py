@@ -1,7 +1,9 @@
 import os
 from dotenv import load_dotenv
 from chromadb.config import Settings
+from pautobot.utils import init_env_file
 
+init_env_file()
 load_dotenv()
 
 # Define the folder for storing database

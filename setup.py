@@ -33,6 +33,7 @@ def get_install_requires():
         "pypandoc>=1.11",
         "tqdm>=4.65.0",
         "fastapi",
+        "requests",
     ]
 
     return install_requires

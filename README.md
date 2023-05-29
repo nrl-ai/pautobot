@@ -55,39 +55,3 @@ python -m pautobot.app
 ```
 
 Go to <http://localhost:5678/> to see the app.
-
-## II. Development
-
-### 1. Backend
-
-- Python 3.10 or higher.
-- Install dependencies:
-
-```shell
-cd pauto-backend
-pip install -r requirements.txt
-```
-
-- Run the backend:
-
-```shell
-uvicorn main:app --reload --port 5678
-```
-
-### 2. Frontend
-
-- Node.js 16.0.0 or higher.
-- Install dependencies:
-
-```shell
-cd pauto-frontend
-npm install
-```
-
-- Run the frontend:
-
-```shell
-npm run dev
-```
-
-Go to <http://localhost:3000/> to see the app.
