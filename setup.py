@@ -46,7 +46,8 @@ def get_long_description():
         "![PAutoBot](./docs/screenshot.png)", ""
     )
     long_description = long_description.replace(
-        '<img alt="PAutoBot" style="width: 128px; max-width: 100%; height: auto;" src="./docs/pautobot.png"/>', ""
+        '<img alt="PAutoBot" style="width: 128px; max-width: 100%; height: auto;" src="./docs/pautobot.png"/>',
+        "",
     )
     return long_description
 
