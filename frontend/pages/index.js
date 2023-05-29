@@ -1,4 +1,3 @@
-"use client";
 import Sidebar from "@components/Sidebar";
 import Main from "@components/Main";
 import { ToastContainer } from "react-toastify";

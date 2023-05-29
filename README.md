@@ -4,6 +4,8 @@
   <p align="center" style="font-size:18px">Private AutoGPT Robot - Your private task assistant with GPT!</p>
 </p>
 
+**NOTE: This project is still in development.**
+
 - **Ask questions** to your documents without an internet connection, using the power of LLMs. 100% private, no data leaves your execution environment at any point. You can ingest documents and ask questions without an internet connection! Engine developed based on [PrivateGPT](https://github.com/imartinez/privateGPT).
 - **Automate tasks** easily with PAutoBot plugins. Easy for everyone!
 

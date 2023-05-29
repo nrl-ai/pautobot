@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import os
 import glob
 from typing import List
@@ -24,7 +23,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.docstore.document import Document
-from constants import CHROMA_SETTINGS
+from pautobot.constants import CHROMA_SETTINGS
 
 
 load_dotenv()
@@ -196,10 +195,7 @@ def main():
     db.persist()
     db = None
 
-    print(
-        "Ingestion complete! You can now run privateGPT.py"
-        " to query your documents"
-    )
+    print("Ingestion complete! You can now query the vectorstore")
 
 
 if __name__ == "__main__":

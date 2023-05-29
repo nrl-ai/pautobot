@@ -1,4 +1,5 @@
 import os
+from typing import Any
 
 from dotenv import load_dotenv
 from langchain.chains import RetrievalQA
@@ -6,9 +7,11 @@ from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.vectorstores import Chroma
 from langchain.llms import GPT4All, LlamaCpp
-from pautoengine.constants import CHROMA_SETTINGS
+from pautobot.constants import CHROMA_SETTINGS
+from pautobot import global_state
 
 load_dotenv()
+
 
 embeddings_model_name = os.environ.get("EMBEDDINGS_MODEL_NAME")
 persist_directory = os.environ.get("PERSIST_DIRECTORY")
@@ -27,8 +30,18 @@ db = Chroma(
 )
 retriever = db.as_retriever(search_kwargs={"k": target_source_chunks})
 
+
 # activate/deactivate the streaming StdOut callback for LLMs
-callbacks = [] if mute_stream else [StreamingStdOutCallbackHandler()]
+class StreamingHandler(StreamingStdOutCallbackHandler):
+    def on_llm_new_token(self, token: str, **kwargs: Any) -> None:
+        """Run on new LLM token. Only available when streaming is enabled."""
+        if global_state.global_answer["answer"] is None:
+            global_state.global_answer["answer"] = token
+        else:
+            global_state.global_answer["answer"] += token
+
+
+callbacks = [] if mute_stream else [StreamingHandler()]
 
 # Prepare the LLM
 match model_type:

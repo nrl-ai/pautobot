@@ -74,7 +74,18 @@ export default function Main() {
               const error = (data && data.message) || response.status;
               return Promise.reject(error);
             }
-            if (data.answer) {
+            if (data.status == "THINKING" && data.answer) {
+              newMessages.pop();
+              newMessages = [
+                ...newMessages,
+                { answer: data.answer, docs: null },
+              ];
+              setMessages(newMessages);
+              saveMessages(newMessages);
+              setTimeout(() => {
+                messageBottomRef.current.scrollIntoView({ behavior: "smooth" });
+              }, 500);
+            } else if (data.status == "READY") {
               clearInterval(interval);
               newMessages.pop();
               newMessages = [

@@ -7,15 +7,10 @@ const bai_jam = Bai_Jamjuree({
   weight: ["200", "300", "400", "500", "600", "700"],
 });
 
-export const metadata = {
-  title: "PAutoBot",
-  description: "PAutoBot - Your private assistant for automation",
-};
-
-export default function RootLayout({ children }) {
+export default function RootLayout({ Component, pageProps}) {
   return (
-    <html lang="en">
-      <body className={bai_jam.className}>{children}</body>
-    </html>
+    <div className={bai_jam.className}>
+      <Component {...pageProps} />
+    </div>
   );
 }
