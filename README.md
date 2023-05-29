@@ -28,7 +28,35 @@
 - `.ppt` : PowerPoint Document,
 - `.txt`: Text file (UTF-8),
 
-## I. Installation
+# I. Installation and Usage
+
+## 1. Installation
+
+- Python 3.10 or higher.
+- Install **PAutoBot**:
+
+```shell
+pip install pautobot
+```
+
+## 2. Usage
+
+- Put your documents in `pautobot-data/documents` folder.
+- Ingest documents:
+
+```shell
+python -m pautobot.ingest
+```
+
+- Run the app:
+
+```shell
+python -m pautobot.app
+```
+
+Go to <http://localhost:5678/> to see the app.
+
+## II. Development
 
 ### 1. Backend
 
