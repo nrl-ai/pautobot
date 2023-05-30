@@ -31,6 +31,7 @@ def get_install_requires():
         "pandoc>=2.3",
         "pypandoc>=1.11",
         "tqdm>=4.65.0",
+        "python-multipart>=0.0.6",
         "fastapi",
         "requests",
     ]

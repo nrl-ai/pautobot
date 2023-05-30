@@ -39,7 +39,6 @@ class QAFactory:
         llm,
         embeddings_model_name,
     ):
-        target_source_chunks = 4
         embeddings = HuggingFaceEmbeddings(model_name=embeddings_model_name)
         database = Chroma(
             persist_directory=persist_directory,
@@ -47,7 +46,7 @@ class QAFactory:
             client_settings=chroma_settings,
         )
         retriever = database.as_retriever(
-            search_kwargs={"k": target_source_chunks}
+            search_kwargs={"k": 4}
         )
         qa_instance = RetrievalQA.from_chain_type(
             llm=llm,

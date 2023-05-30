@@ -118,7 +118,7 @@ def process_documents(
     documents = load_documents(source_directory, ignored_files)
     if not documents:
         print("No new documents to load")
-        exit(0)
+        return []
     print(f"Loaded {len(documents)} new documents from {source_directory}")
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=chunk_size, chunk_overlap=chunk_overlap
@@ -126,7 +126,7 @@ def process_documents(
     texts = text_splitter.split_documents(documents)
     print(
         f"Split into {len(texts)} chunks of text "
-        "(max. {chunk_size} tokens each)"
+        f"(max. {chunk_size} tokens each)"
     )
     return texts
 
@@ -172,12 +172,18 @@ def ingest_documents(
             source_directory,
             [metadata["source"] for metadata in collection["metadatas"]],
         )
+        if not texts:
+            print("No new documents to load")
+            return
         print("Creating embeddings. May take some minutes...")
         db.add_documents(texts)
     else:
         # Create and store locally vectorstore
         print("Creating new vectorstore")
-        texts = process_documents(process_documents)
+        texts = process_documents(source_directory)
+        if not texts:
+            print("No new documents to load")
+            return
         print("Creating embeddings. May take some minutes...")
         db = Chroma.from_documents(
             texts,

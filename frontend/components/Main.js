@@ -111,14 +111,14 @@ export default function Main() {
 
   return (
     <>
-      <div className="flex flex-col w-full">
-        <div className="mx-2 md:px-5 sm:py-4 flex-grow mb-[150px]">
+      <div className="flex flex-col w-full xl:max-w-[800px] xl:mx-auto">
+        <div className="mx-2 md:px-5 sm:py-4 flex-grow mb-[150px] pb-8 max-h-full pt-[50px] rounded-xl mt-8">
           <div className="text-black">
             {messages.map((message, index) => {
               if (message.query) {
                 return (
                   <div key={index} className="flex justify-end mb-2">
-                    <div className="bg-gray-300 rounded-lg p-3">
+                    <div className="bg-gray-50 rounded-lg p-3 md:max-w-[80%] break-all">
                       <p className="text-gray-700">{message.query}</p>
                     </div>
                   </div>
@@ -126,7 +126,7 @@ export default function Main() {
               } else {
                 return (
                   <div key={index} className="flex justify-start mb-2">
-                    <div className="bg-gray-100 rounded-lg p-3">
+                    <div className="bg-gray-100 rounded-lg p-3 md:max-w-[80%] break-all">
                       <p className="text-gray-700 font-bold">
                         {message.answer}
                         {message.answer === "Thinking..." && (
@@ -170,12 +170,13 @@ export default function Main() {
             <div ref={messageBottomRef}></div>
           </div>
         </div>
-        <div className="fixed left-[400px] right-0 bottom-0">
+        <div className="fixed left-[400px] right-0 bottom-0 xl:max-w-[1000px] xl:mx-auto">
           <NewMessage
             onSubmitMessage={(mode, message) => {
               onSubmitMessage(mode, message);
             }}
           />
+          <div className="h-8 bg-white"></div>
         </div>
       </div>
     </>

@@ -1,4 +1,6 @@
 import os
+import shutil
+import pathlib
 
 from chromadb.config import Settings
 
@@ -50,7 +52,7 @@ class PautoBotEngine:
         # Prepare the retriever
         self.qa_instance = None
         self.qa_instance_error = None
-        if mode == BotMode.CHAT:
+        if mode == BotMode.CHAT.value:
             return
 
         # Define the Chroma settings
@@ -73,6 +75,15 @@ class PautoBotEngine:
             print("Switching to chat mode...")
             self.qa_instance_error = "Error while initializing retriever!"
 
+    def add_document(self, file: bytes):
+        pathlib.Path(self.documents_directory).mkdir(
+            parents=True, exist_ok=True
+        )
+        with open(
+            os.path.join(self.documents_directory, file.filename), "wb+"
+        ) as destination:
+            shutil.copyfileobj(file.file, destination)
+
     def ingest_documents(self):
         ingest_documents(
             self.documents_directory,
@@ -80,21 +91,28 @@ class PautoBotEngine:
             self.chroma_settings,
             self.embeddings_model_name,
         )
+        # Reload QA
+        self.qa_instance = QAFactory.create_qa(
+            chroma_settings=self.chroma_settings,
+            persist_directory=self.persist_directory,
+            llm=self.llm,
+            embeddings_model_name=self.embeddings_model_name,
+        )
 
     def check_query(self, mode, query):
-        if mode == BotMode.QA and self.mode == BotMode.CHAT:
+        if mode == BotMode.QA.value and self.mode == BotMode.CHAT.value:
             raise Exception(
                 "PautobotEngine was initialized in chat mode! "
                 "Please restart in QA mode."
             )
-        elif mode == BotMode.QA and self.qa_instance is None:
+        elif mode == BotMode.QA.value and self.qa_instance is None:
             raise Exception(self.qa_instance_error)
 
     def query(self, mode, query):
         self.check_query(mode, query)
         if mode is None:
             mode = self.mode
-        if mode == BotMode.QA and self.qa_instance is None:
+        if mode == BotMode.QA.value and self.qa_instance is None:
             print(self.qa_instance_error)
             mode = BotMode.CHAT
         self.current_answer = {
@@ -102,10 +120,10 @@ class PautoBotEngine:
             "answer": "",
             "docs": [],
         }
-        if mode == BotMode.QA:
+        if mode == BotMode.QA.value:
             try:
                 print("Received query: ", query)
-                print("Thinking...")
+                print("Searching...")
                 res = self.qa_instance(query)
                 answer, docs = (
                     res["result"],

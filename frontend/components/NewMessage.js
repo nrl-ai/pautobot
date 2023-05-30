@@ -6,13 +6,13 @@ export default function NewMessage({ onSubmitMessage }) {
 
   return (
     <>
-      <form className="w-full px-2">
+      <form className="w-full px-6">
         <label htmlFor="chat" className="sr-only">
           Your message
         </label>
-        <div className="flex items-center bg-gray-200 pt-6 rounded-t-2xl overflow-hidden pb-8 px-2">
+        <div className="flex items-center bg-gray-200 pt-6 rounded-2xl overflow-hidden pb-8 px-2">
           <select
-            class="text-lg bg-gray-50 border border-gray-300 text-gray-900 py-3 rounded-l-2xl ml-4 focus:ring-gray-500 focus:border-gray-500 block w-[200px] px-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-gray-500 dark:focus:border-gray-500"
+            className="text-lg bg-gray-50 border border-gray-300 text-gray-900 py-3 rounded-l-2xl ml-4 focus:ring-gray-500 focus:border-gray-500 block w-[200px] px-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-gray-500 dark:focus:border-gray-500 focus:outline-none"
             defaultValue={"CHAT"}
             onChange={(e) => setMode(e.target.value)}
           >
@@ -21,7 +21,7 @@ export default function NewMessage({ onSubmitMessage }) {
           </select>
           <textarea
             rows="1"
-            className="block mr-4 p-2.5 w-full text-lg text-gray-900 bg-gray-50 rounded-r-2xl border border-gray-300 focus:ring-gray-500 focus:border-gray-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-gray-500 dark:focus:border-gray-500"
+            className="block mr-4 p-2.5 w-full text-lg text-gray-900 bg-gray-50 rounded-r-2xl border border-gray-300 focus:ring-gray-500 focus:border-gray-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-gray-500 dark:focus:border-gray-500 focus:outline-none"
             placeholder="What are you thinking about?..."
             value={message}
             onChange={(e) => setMessage(e.target.value)}

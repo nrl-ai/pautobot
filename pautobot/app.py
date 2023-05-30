@@ -2,7 +2,7 @@ import os
 
 import uvicorn
 from fastapi.staticfiles import StaticFiles
-from fastapi import FastAPI, BackgroundTasks
+from fastapi import FastAPI, BackgroundTasks, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
 from pautobot.models import Query
@@ -29,6 +29,19 @@ def main():
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+    @app.post("/api/upload")
+    async def upload(file: UploadFile = File(...)):
+        if not file:
+            return {"message": "No file sent"}
+        else:
+            engine.add_document(file)
+            return {"message": "File uploaded"}
+
+    @app.post("/api/ingest")
+    async def ingest():
+        engine.ingest_documents()
+        return {"message": "Ingestion finished!"}
 
     @app.post("/api/ask")
     async def ask(query: Query, background_tasks: BackgroundTasks):
