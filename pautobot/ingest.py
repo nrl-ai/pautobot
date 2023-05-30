@@ -1,7 +1,6 @@
 import os
 import glob
 from typing import List
-from dotenv import load_dotenv
 from multiprocessing import Pool
 from tqdm import tqdm
 
@@ -23,16 +22,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.docstore.document import Document
-from pautobot.constants import CHROMA_SETTINGS
 
-
-load_dotenv()
-
-
-# Load environment variables
-persist_directory = os.environ.get("PERSIST_DIRECTORY")
-source_directory = os.environ.get("SOURCE_DIRECTORY", "source_documents")
-embeddings_model_name = os.environ.get("EMBEDDINGS_MODEL_NAME")
 chunk_size = 500
 chunk_overlap = 50
 
@@ -63,7 +53,6 @@ class MyElmLoader(UnstructuredEmailLoader):
 # Map file extensions to document loaders and their arguments
 LOADER_MAPPING = {
     ".csv": (CSVLoader, {}),
-    # ".docx": (Docx2txtLoader, {}),
     ".doc": (UnstructuredWordDocumentLoader, {}),
     ".docx": (UnstructuredWordDocumentLoader, {}),
     ".enex": (EverNoteLoader, {}),
@@ -76,7 +65,6 @@ LOADER_MAPPING = {
     ".ppt": (UnstructuredPowerPointLoader, {}),
     ".pptx": (UnstructuredPowerPointLoader, {}),
     ".txt": (TextLoader, {"encoding": "utf8"}),
-    # Add more mappings for other file extensions and loaders as needed
 }
 
 
@@ -120,7 +108,9 @@ def load_documents(
     return results
 
 
-def process_documents(ignored_files: List[str] = []) -> List[Document]:
+def process_documents(
+    source_directory, ignored_files: List[str] = []
+) -> List[Document]:
     """
     Load documents and split in chunks
     """
@@ -163,7 +153,9 @@ def does_vectorstore_exist(persist_directory: str) -> bool:
     return False
 
 
-def main():
+def ingest_documents(
+    source_directory, persist_directory, chroma_settings, embeddings_model_name
+):
     # Create embeddings
     embeddings = HuggingFaceEmbeddings(model_name=embeddings_model_name)
 
@@ -173,30 +165,27 @@ def main():
         db = Chroma(
             persist_directory=persist_directory,
             embedding_function=embeddings,
-            client_settings=CHROMA_SETTINGS,
+            client_settings=chroma_settings,
         )
         collection = db.get()
         texts = process_documents(
-            [metadata["source"] for metadata in collection["metadatas"]]
+            source_directory,
+            [metadata["source"] for metadata in collection["metadatas"]],
         )
         print("Creating embeddings. May take some minutes...")
         db.add_documents(texts)
     else:
         # Create and store locally vectorstore
         print("Creating new vectorstore")
-        texts = process_documents()
+        texts = process_documents(process_documents)
         print("Creating embeddings. May take some minutes...")
         db = Chroma.from_documents(
             texts,
             embeddings,
             persist_directory=persist_directory,
-            client_settings=CHROMA_SETTINGS,
+            client_settings=chroma_settings,
         )
     db.persist()
     db = None
 
     print("Ingestion complete! You can now query the vectorstore")
-
-
-if __name__ == "__main__":
-    main()

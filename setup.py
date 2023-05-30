@@ -25,7 +25,6 @@ def get_install_requires():
         "llama-cpp-python>=0.1.50",
         "urllib3>=2.0.2",
         "pdfminer.six>=20221105",
-        "python-dotenv>=1.0.0",
         "unstructured>=0.6.6",
         "extract-msg>=0.41.1",
         "tabulate>=0.9.0",
@@ -70,14 +69,16 @@ setup(
         "Natural Language :: English",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3 :: Only",
     ],
     package_data={
         "pautobot": [
             "pautobot/frontend-dist/**/*",
             "pautobot/frontend-dist/*",
-            "pautobot/example.env",
         ]
     },
     include_package_data=True,

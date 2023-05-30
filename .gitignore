@@ -6,7 +6,6 @@ pautobot-data/database
 pautobot-data/models
 pautobot-data/documents
 pautobot-data/frontend-dist
-.env
 *.egg-info
 frontend/dist
 pautobot/frontend-dist

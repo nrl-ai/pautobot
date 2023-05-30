@@ -1,24 +1,22 @@
+import os
+
 import uvicorn
-from dotenv import load_dotenv
 from fastapi.staticfiles import StaticFiles
 from fastapi import FastAPI, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 
 from pautobot.models import Query
-from pautobot.utils import (
-    extract_frontend_dist,
-    init_env_file,
-    download_model_if_needed,
-)
+from pautobot.utils import extract_frontend_dist
+from pautobot.bot_enums import BotMode, BotStatus
+from pautobot.engine import PautoBotEngine
 
 
 def main():
-    init_env_file()
-    load_dotenv()
-    download_model_if_needed()
-    static_folder = "pautobot-data/frontend-dist"
+    static_folder = os.path.abspath(
+        os.path.join(os.path.expanduser("~"), "pautobot-data", "frontend-dist")
+    )
+    print(static_folder)
     extract_frontend_dist(static_folder)
-    from pautobot.engine import PautoBotEngine, BotStatus, BotMode
 
     # PautoBot engine
     engine = PautoBotEngine(mode=BotMode.QA)

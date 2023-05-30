@@ -10,7 +10,7 @@ export default function NewMessage({ onSubmitMessage }) {
         <label htmlFor="chat" className="sr-only">
           Your message
         </label>
-        <div className="flex items-center bg-gray-300 pt-4 rounded-t-2xl overflow-hidden pb-8">
+        <div className="flex items-center bg-gray-200 pt-6 rounded-t-2xl overflow-hidden pb-8 px-2">
           <select
             class="text-lg bg-gray-50 border border-gray-300 text-gray-900 py-3 rounded-l-2xl ml-4 focus:ring-gray-500 focus:border-gray-500 block w-[200px] px-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-gray-500 dark:focus:border-gray-500"
             defaultValue={"CHAT"}
