@@ -43,7 +43,7 @@ class PautoBotEngine:
         self.answer_q = queue.Queue()
 
         embeddings_model_name = os.environ.get("EMBEDDINGS_MODEL_NAME")
-        persist_directory = os.environ.get("PERSIST_DIRECTORY")
+        self.persist_directory = os.environ.get("PERSIST_DIRECTORY")
         model_path = os.environ.get("MODEL_PATH")
         model_n_ctx = os.environ.get("MODEL_N_CTX")
         target_source_chunks = int(os.environ.get("TARGET_SOURCE_CHUNKS", 4))
@@ -70,6 +70,7 @@ class PautoBotEngine:
 
         # Prepare the retriever
         self.qa_instance = None
+        self.qa_instance_error = None
         if mode == BotMode.CHAT:
             return
         try:
@@ -77,7 +78,7 @@ class PautoBotEngine:
                 model_name=embeddings_model_name
             )
             db = Chroma(
-                persist_directory=persist_directory,
+                persist_directory=self.persist_directory,
                 embedding_function=embeddings,
                 client_settings=CHROMA_SETTINGS,
             )
@@ -90,19 +91,30 @@ class PautoBotEngine:
                 retriever=retriever,
                 return_source_documents=True,
             )
-            self.mode = BotMode.QA
         except Exception as e:
             print(f"Error while initializing retriever: {e}")
             print("Switching to chat mode...")
-            self.mode = BotMode.CHAT
+            self.qa_instance_error = f"Error while initializing retriever! Please prepare your documents in `{self.persist_directory}` and run: python -m pautobot.ingest"
 
-    def query(self, query):
+    def check_query(self, mode, query):
+        if mode == BotMode.QA and self.mode == BotMode.CHAT:
+            raise Exception("PautobotEngine was initialized in chat mode! Please restart with QA mode.")
+        elif mode == BotMode.QA and self.qa_instance is None:
+            raise Exception(self.qa_instance_error)
+
+    def query(self, mode, query):
+        self.check_query(mode, query)
+        if mode is None:
+            mode = self.mode
+        if mode == BotMode.QA and self.qa_instance is None:
+            print(self.qa_instance_error)
+            mode = BotMode.CHAT
         self.current_answer = {
             "status": BotStatus.THINKING,
             "answer": "",
             "docs": [],
         }
-        if self.mode == BotMode.QA:
+        if mode == BotMode.QA:
             try:
                 print("Received query: ", query)
                 print("Thinking...")
@@ -126,9 +138,12 @@ class PautoBotEngine:
                 }
             except Exception as e:
                 print("Error during thinking: ", e)
+                answer = "Error during thinking! Please try again."
+                if "Index not found" in str(e):
+                    answer = f"Index not found! Please prepare your documents in `{self.persist_directory}` and run: python -m pautobot.ingest"
                 self.current_answer = {
                     "status": BotStatus.READY,
-                    "answer": "Error during thinking! Please try again.",
+                    "answer": answer,
                     "docs": None,
                 }
         else:

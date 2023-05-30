@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 export default function NewMessage({ onSubmitMessage }) {
+  const [mode, setMode] = useState("CHAT");
   const [message, setMessage] = useState("");
 
   return (
@@ -9,29 +10,18 @@ export default function NewMessage({ onSubmitMessage }) {
         <label htmlFor="chat" className="sr-only">
           Your message
         </label>
-        <div className="flex items-center bg-gray-300 px-2 pt-4 rounded-t-2xl overflow-hidden pb-8">
-          <button
-            type="button"
-            className="inline-flex justify-center p-2 text-gray-500 rounded-lg cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600"
+        <div className="flex items-center bg-gray-300 pt-4 rounded-t-2xl overflow-hidden pb-8">
+          <select
+            class="text-lg bg-gray-50 border border-gray-300 text-gray-900 py-3 rounded-l-2xl ml-4 focus:ring-gray-500 focus:border-gray-500 block w-[200px] px-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-gray-500 dark:focus:border-gray-500"
+            defaultValue={"CHAT"}
+            onChange={(e) => setMode(e.target.value)}
           >
-            <svg
-              aria-hidden="true"
-              className="w-8 h-8"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                fillRule="evenodd"
-                d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
-                clipRule="evenodd"
-              ></path>
-            </svg>
-            <span className="sr-only">Upload image</span>
-          </button>
+            <option value="CHAT">Chat</option>
+            <option value="QA">Chat + Q&A</option>
+          </select>
           <textarea
-            rows="2"
-            className="block mx-4 p-2.5 w-full text-lg text-gray-900 bg-gray-50 rounded-2xl border border-gray-300 focus:ring-gray-500 focus:border-gray-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-gray-500 dark:focus:border-gray-500"
+            rows="1"
+            className="block mr-4 p-2.5 w-full text-lg text-gray-900 bg-gray-50 rounded-r-2xl border border-gray-300 focus:ring-gray-500 focus:border-gray-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-gray-500 dark:focus:border-gray-500"
             placeholder="What are you thinking about?..."
             value={message}
             onChange={(e) => setMessage(e.target.value)}
@@ -39,7 +29,7 @@ export default function NewMessage({ onSubmitMessage }) {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
                 if (!message) return;
-                onSubmitMessage(message);
+                onSubmitMessage(mode, message);
                 setMessage("");
               }
             }}
@@ -50,7 +40,7 @@ export default function NewMessage({ onSubmitMessage }) {
             onClick={(e) => {
               e.preventDefault();
               if (!message) return;
-              onSubmitMessage(message);
+              onSubmitMessage(mode, message);
               setMessage("");
             }}
           >

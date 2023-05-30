@@ -27,7 +27,7 @@ export default function Main() {
     localStorage.setItem("messages", JSON.stringify(messages));
   };
 
-  const onSubmitMessage = (query) => {
+  const onSubmitMessage = (mode, message) => {
     if (thinking) {
       toast.warning("I am thinking about previous question! Please wait...");
       return;
@@ -35,7 +35,7 @@ export default function Main() {
     setThinking(true);
     let newMessages = [
       ...messages,
-      { query: query },
+      { query: message },
       { answer: "Thinking..." },
     ];
     setMessages(newMessages);
@@ -52,7 +52,7 @@ export default function Main() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ query: query }),
+      body: JSON.stringify({ mode: mode, query: message }),
     })
       .then(async (response) => {
         let data = await response.json();
@@ -172,8 +172,8 @@ export default function Main() {
         </div>
         <div className="fixed left-[400px] right-0 bottom-0">
           <NewMessage
-            onSubmitMessage={(query) => {
-              onSubmitMessage(query);
+            onSubmitMessage={(mode, message) => {
+              onSubmitMessage(mode, message);
             }}
           />
         </div>

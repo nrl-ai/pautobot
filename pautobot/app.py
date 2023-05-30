@@ -19,7 +19,7 @@ def main():
     extract_frontend_dist(static_folder)
 
     # PautoBot engine
-    engine = PautoBotEngine(mode=BotMode.CHAT)
+    engine = PautoBotEngine(mode=BotMode.QA)
 
     # Backend app
     app = FastAPI()
@@ -32,6 +32,7 @@ def main():
 
     @app.post("/api/ask")
     async def ask(query: Query, background_tasks: BackgroundTasks):
+        engine.check_query(query.mode, query.query)
         if engine.current_answer["status"] == BotStatus.THINKING:
             raise Exception("I am still thinking! Please wait.")
         engine.current_answer = {
@@ -39,7 +40,7 @@ def main():
             "answer": "",
             "docs": [],
         }
-        background_tasks.add_task(engine.query, query.query)
+        background_tasks.add_task(engine.query, query.mode, query.query)
         return {"message": "Query received"}
 
     @app.get("/api/get_answer")
