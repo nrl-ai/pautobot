@@ -16,6 +16,7 @@ def extract_frontend_dist(static_folder):
     and put it in the same static folder for serving
     """
     dist_folder = pkg_resources.resource_filename("pautobot", "frontend-dist")
+    print(dist_folder)
     if os.path.exists(static_folder):
         shutil.rmtree(static_folder)
     pathlib.Path(static_folder).parent.mkdir(parents=True, exist_ok=True)
@@ -31,6 +32,7 @@ def init_env_file():
         example_env_file = pkg_resources.resource_filename(
             "pautobot", "example.env"
         )
+        print(example_env_file)
         shutil.copy(example_env_file, env_file)
     dotenv.load_dotenv()
 

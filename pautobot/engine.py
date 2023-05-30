@@ -98,7 +98,9 @@ class PautoBotEngine:
 
     def check_query(self, mode, query):
         if mode == BotMode.QA and self.mode == BotMode.CHAT:
-            raise Exception("PautobotEngine was initialized in chat mode! Please restart with QA mode.")
+            raise Exception(
+                "PautobotEngine was initialized in chat mode! Please restart with QA mode."
+            )
         elif mode == BotMode.QA and self.qa_instance is None:
             raise Exception(self.qa_instance_error)
 

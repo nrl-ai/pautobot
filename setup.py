@@ -73,6 +73,14 @@ setup(
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3 :: Only",
     ],
+    package_data={
+        "pautobot": [
+            "pautobot/frontend-dist/**/*",
+            "pautobot/frontend-dist/*",
+            "pautobot/example.env",
+        ]
+    },
+    include_package_data=True,
     entry_points={
         "console_scripts": [
             "pautobot=pautobot.app:main",

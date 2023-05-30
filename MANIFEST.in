@@ -1,2 +1,0 @@
-recursive-include pautobot/frontend-dist *
-include pautobot/example.env
