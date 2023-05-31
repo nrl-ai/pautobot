@@ -45,9 +45,7 @@ class QAFactory:
             embedding_function=embeddings,
             client_settings=chroma_settings,
         )
-        retriever = database.as_retriever(
-            search_kwargs={"k": 4}
-        )
+        retriever = database.as_retriever(search_kwargs={"k": 4})
         qa_instance = RetrievalQA.from_chain_type(
             llm=llm,
             chain_type="stuff",

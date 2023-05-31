@@ -44,11 +44,12 @@ def get_long_description():
     with open("README.md", encoding="utf-8") as f:
         long_description = f.read()
     long_description = long_description.replace(
-        "![PAutoBot](./docs/screenshot.png)", ""
+        "![PAutoBot](./docs/screenshot.png)",
+        "![PAutoBot](https://raw.githubusercontent.com/nrl-ai/pautobot/main/docs/screenshot.png)",
     )
     long_description = long_description.replace(
         '<img alt="PAutoBot" style="width: 128px; max-width: 100%; height: auto;" src="./docs/pautobot.png"/>',
-        "",
+        '<img alt="PAutoBot" style="width: 128px; max-width: 100%; height: auto;" src="https://raw.githubusercontent.com/nrl-ai/pautobot/main/docs/pautobot.png"/>',
     )
     return long_description
 

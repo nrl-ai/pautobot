@@ -1,6 +1,8 @@
 import "@styles/globals.css";
-import { Bai_Jamjuree } from "next/font/google";
 import "react-toastify/dist/ReactToastify.css";
+
+import { Bai_Jamjuree } from "next/font/google";
+import Head from "next/head";
 
 const bai_jam = Bai_Jamjuree({
   subsets: ["latin", "vietnamese"],
@@ -9,8 +11,13 @@ const bai_jam = Bai_Jamjuree({
 
 export default function RootLayout({ Component, pageProps }) {
   return (
-    <div className={bai_jam.className}>
-      <Component {...pageProps} />
-    </div>
+    <>
+      <Head>
+        <title>PAutoBot - Your Private GPT Assistant</title>
+      </Head>
+      <div className={bai_jam.className}>
+        <Component {...pageProps} />
+      </div>
+    </>
   );
 }

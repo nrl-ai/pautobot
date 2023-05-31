@@ -43,6 +43,14 @@ def main():
         engine.ingest_documents()
         return {"message": "Ingestion finished!"}
 
+    @app.get("/api/get_documents")
+    async def get_documents():
+        return engine.get_documents()
+
+    @app.post("/api/open_in_file_explorer")
+    async def open_in_file_explorer():
+        engine.open_in_file_explorer()
+
     @app.post("/api/ask")
     async def ask(query: Query, background_tasks: BackgroundTasks):
         engine.check_query(query.mode, query.query)

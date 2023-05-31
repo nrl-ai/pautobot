@@ -1,13 +1,15 @@
 import os
 import shutil
 import pathlib
+import uuid
+import json
 
 from chromadb.config import Settings
 
 from pautobot.bot_enums import BotMode, BotStatus
 from pautobot.llm_factory import LLMFactory, QAFactory
 from pautobot.ingest import ingest_documents
-from pautobot.utils import intialize_model
+from pautobot.utils import intialize_model, open_file
 
 
 class PautoBotEngine:
@@ -79,10 +81,31 @@ class PautoBotEngine:
         pathlib.Path(self.documents_directory).mkdir(
             parents=True, exist_ok=True
         )
+        file_extension = os.path.splitext(file.filename)[1]
+        unique_file_id = uuid.uuid4()
+        new_filename = f"{unique_file_id}.{file_extension}"
         with open(
-            os.path.join(self.documents_directory, file.filename), "wb+"
+            os.path.join(self.documents_directory, new_filename), "wb+"
         ) as destination:
             shutil.copyfileobj(file.file, destination)
+        metadata_filename = f"{unique_file_id}.json"
+        with open(
+            os.path.join(self.documents_directory, metadata_filename), "w"
+        ) as metadata_file:
+            metadata_file.write(
+                f'{{"source": "{file.filename}", "id": "{unique_file_id}"}}'
+            )
+
+    def get_documents(self):
+        documents = []
+        for filename in os.listdir(self.documents_directory):
+            if filename.endswith(".json"):
+                with open(
+                    os.path.join(self.documents_directory, filename), "r"
+                ) as metadata_file:
+                    metadata = json.load(metadata_file)
+                    documents.append(metadata)
+        return documents
 
     def ingest_documents(self):
         ingest_documents(
@@ -98,6 +121,9 @@ class PautoBotEngine:
             llm=self.llm,
             embeddings_model_name=self.embeddings_model_name,
         )
+
+    def open_in_file_explorer(self):
+        open_file(self.documents_directory)
 
     def check_query(self, mode, query):
         if mode == BotMode.QA.value and self.mode == BotMode.CHAT.value:

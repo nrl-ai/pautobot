@@ -4,9 +4,23 @@ import shutil
 import pathlib
 import traceback
 import requests
+import platform
+import subprocess
 
 import tempfile
 from tqdm import tqdm
+
+
+def open_file(path):
+    """
+    Open file in default application
+    """
+    if platform.system() == "Windows":
+        os.startfile(path)
+    elif platform.system() == "Darwin":
+        subprocess.Popen(["open", path])
+    else:
+        subprocess.Popen(["xdg-open", path])
 
 
 def extract_frontend_dist(static_folder):
