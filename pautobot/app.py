@@ -9,13 +9,13 @@ from pautobot.models import Query
 from pautobot.utils import extract_frontend_dist
 from pautobot.bot_enums import BotMode, BotStatus
 from pautobot.engine import PautoBotEngine
+from pautobot.app_info import __appname__, __version__, DATA_ROOT
 
 
 def main():
-    static_folder = os.path.abspath(
-        os.path.join(os.path.expanduser("~"), "pautobot-data", "frontend-dist")
-    )
-    print(static_folder)
+    print(f"Starting {__appname__}...")
+    print(f"Version: {__version__}")
+    static_folder = os.path.abspath(os.path.join(DATA_ROOT, "frontend-dist"))
     extract_frontend_dist(static_folder)
 
     # PautoBot engine
@@ -54,9 +54,9 @@ def main():
     @app.post("/api/ask")
     async def ask(query: Query, background_tasks: BackgroundTasks):
         engine.check_query(query.mode, query.query)
-        if engine.current_answer["status"] == BotStatus.THINKING:
+        if engine.context.current_answer["status"] == BotStatus.THINKING:
             raise Exception("I am still thinking! Please wait.")
-        engine.current_answer = {
+        engine.context.current_answer = {
             "status": BotStatus.THINKING,
             "answer": "",
             "docs": [],
@@ -67,6 +67,10 @@ def main():
     @app.get("/api/get_answer")
     async def get_answer():
         return engine.get_answer()
+
+    @app.post("/api/get_chat_history")
+    async def get_chat_history():
+        return engine.get_chat_history()
 
     app.mount(
         "/", StaticFiles(directory=static_folder, html=True), name="static"

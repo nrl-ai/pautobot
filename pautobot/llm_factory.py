@@ -2,6 +2,10 @@ from langchain.llms import GPT4All, LlamaCpp
 from langchain.chains import RetrievalQA
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import Chroma
+from chromadb.config import Settings
+
+from pautobot.utils import download_model
+from pautobot.bot_context import BotContext
 
 
 class LLMFactory:
@@ -11,6 +15,9 @@ class LLMFactory:
     def create_llm(
         model_type, model_path, model_n_ctx, streaming=False, verbose=False
     ):
+        # Download the model
+        download_model(model_type, model_path)
+
         # Prepare the LLM
         if model_type == "LlamaCpp":
             return LlamaCpp(
@@ -34,14 +41,19 @@ class QAFactory:
 
     @staticmethod
     def create_qa(
-        chroma_settings,
-        persist_directory,
+        context: BotContext,
         llm,
-        embeddings_model_name,
     ):
-        embeddings = HuggingFaceEmbeddings(model_name=embeddings_model_name)
+        chroma_settings = Settings(
+            chroma_db_impl="duckdb+parquet",
+            persist_directory=context.search_db_directory,
+            anonymized_telemetry=False,
+        )
+        embeddings = HuggingFaceEmbeddings(
+            model_name=context.embeddings_model_name
+        )
         database = Chroma(
-            persist_directory=persist_directory,
+            persist_directory=context.search_db_directory,
             embedding_function=embeddings,
             client_settings=chroma_settings,
         )
