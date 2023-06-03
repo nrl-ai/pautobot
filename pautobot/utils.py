@@ -62,9 +62,13 @@ def download_file(url, file_path):
         print("Failed to download file.")
 
 
-def intialize_model(model_path):
+def download_model(model_type, model_path):
     """
     Download model if not exists
+    TODO (vietanhdev):
+        - Support more model types
+        - Multiple download links
+        - Check hash of the downloaded file
     """
     MODEL_URL = "https://gpt4all.io/models/ggml-gpt4all-j-v1.3-groovy.bin"
     if not os.path.exists(model_path):

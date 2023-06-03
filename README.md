@@ -4,12 +4,11 @@
   <p align="center" style="font-size:18px"><b>Private AutoGPT Robot</b> - Your private task assistant with GPT!</p>
 </p>
 
-**NOTE: This project is still in development.**
-
-- **Ask questions** to your documents without an internet connection, using the power of LLMs. 100% private, no data leaves your execution environment at any point. You can ingest documents and ask questions without an internet connection! Engine developed based on [PrivateGPT](https://github.com/imartinez/privateGPT).
-- **Automate tasks** easily with PAutoBot plugins. Easy for everyone!
-
-Built with [LangChain](https://github.com/hwchase17/langchain), [GPT4All](https://github.com/nomic-ai/gpt4all), [LlamaCpp](https://github.com/ggerganov/llama.cpp), [Chroma](https://www.trychroma.com/), [SentenceTransformers](https://www.sbert.net/), [PrivateGPT](https://github.com/imartinez/privateGPT).
+- 🔥 **Chat** to your offline **LLMs on CPU Only**. **100% private**, no data leaves your execution environment at any point.
+- 🔥 **Ask questions** to your documents without an internet connection. Engine developed based on [PrivateGPT](https://github.com/imartinez/privateGPT).
+- 🔥 **Automate tasks** easily with **PAutoBot plugins**. Easy for everyone.
+- 🔥 **Easy coding structure** with **Next.js** and **Python**. Easy to understand and modify.
+- 🔥 **Built with** [LangChain](https://github.com/hwchase17/langchain), [GPT4All](https://github.com/nomic-ai/gpt4all), [LlamaCpp](https://github.com/ggerganov/llama.cpp), [Chroma](https://www.trychroma.com/), [SentenceTransformers](https://www.sbert.net/), [PrivateGPT](https://github.com/imartinez/privateGPT).
 
 ![PAutoBot](./docs/screenshot.png)
 
@@ -40,6 +39,23 @@ Built with [LangChain](https://github.com/hwchase17/langchain), [GPT4All](https:
 ```shell
 pip install pautobot
 ```
+
+### For Windows 10/11
+
+To install a C++ compiler on Windows 10/11, follow these steps:
+
+1. Install Visual Studio 2022.
+2. Make sure the following components are selected:
+   - Universal Windows Platform development
+   - C++ CMake tools for Windows
+3. Download the MinGW installer from the [MinGW website](https://sourceforge.net/projects/mingw/).
+4. Run the installer and select the `gcc` component.
+
+### Mac Running Intel
+
+When running a Mac with Intel hardware (not M1), you may run into _clang: error: the clang compiler does not support '-march=native'_ during pip install.
+
+If so set your archflags during pip install. eg: _ARCHFLAGS="-arch x86_64" pip3 install -r requirements.txt_
 
 ## 2. Usage
 

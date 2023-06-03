@@ -3,6 +3,7 @@ import glob
 from typing import List
 from multiprocessing import Pool
 from tqdm import tqdm
+from chromadb.config import Settings
 
 from langchain.document_loaders import (
     CSVLoader,
@@ -154,8 +155,14 @@ def does_vectorstore_exist(persist_directory: str) -> bool:
 
 
 def ingest_documents(
-    source_directory, persist_directory, chroma_settings, embeddings_model_name
+    source_directory, persist_directory, embeddings_model_name
 ):
+    chroma_settings = Settings(
+        chroma_db_impl="duckdb+parquet",
+        persist_directory=persist_directory,
+        anonymized_telemetry=False,
+    )
+
     # Create embeddings
     embeddings = HuggingFaceEmbeddings(model_name=embeddings_model_name)
 
