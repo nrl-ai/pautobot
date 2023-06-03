@@ -1,7 +1,7 @@
 import os
 
 from pautobot.bot_enums import BotMode, BotStatus
-from pautobot.llm_factory import LLMFactory, QAFactory
+from pautobot.llm_factory import LLMFactory, ChatbotFactory, QAFactory
 from pautobot.ingest import ingest_documents
 from pautobot.utils import open_file
 from pautobot.bot_context import BotContext
@@ -32,6 +32,7 @@ class PautoBotEngine:
             streaming=False,
             verbose=False,
         )
+        self.chatbot_instance = ChatbotFactory.create_chatbot(self.llm)
 
         # Prepare the retriever
         self.qa_instance = None
@@ -77,13 +78,15 @@ class PautoBotEngine:
         """Check if the query is valid.
         Raises an exception on invalid query.
         """
+        if not query:
+            raise ValueError("Query cannot be empty!")
         if mode == BotMode.QA.value and self.mode == BotMode.CHAT.value:
-            raise Exception(
+            raise ValueError(
                 "PautobotEngine was initialized in chat mode! "
                 "Please restart in QA mode."
             )
         elif mode == BotMode.QA.value and self.qa_instance is None:
-            raise Exception(self.qa_instance_error)
+            raise ValueError(self.qa_instance_error)
 
     def query(self, mode, query):
         """Query the bot."""
@@ -134,7 +137,8 @@ class PautoBotEngine:
             try:
                 print("Received query: ", query)
                 print("Thinking...")
-                answer = self.llm(query)
+                answer = self.chatbot_instance.predict(human_input=query)
+                print("Answer: ", answer)
                 self.context.current_answer = {
                     "status": BotStatus.READY,
                     "answer": answer,
