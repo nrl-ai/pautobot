@@ -95,5 +95,23 @@ class BotContext:
                     documents.append(metadata)
         return documents
 
+    def write_chat_history(self, chat_history: dict):
+        """Write a message to the bot's chat history."""
+        with open(self.chat_history_file, "r") as chat_history_file:
+            chat_history_list = json.load(chat_history_file)
+        chat_history_list.append(chat_history)
+        with open(self.chat_history_file, "w") as chat_history_file:
+            json.dump(chat_history_list, chat_history_file)
+
+    def get_chat_history(self):
+        """Get the bot's chat history."""
+        with open(self.chat_history_file, "r") as chat_history_file:
+            return json.load(chat_history_file)
+
+    def clear_chat_history(self):
+        """Clear the bot's chat history."""
+        with open(self.chat_history_file, "w") as chat_history_file:
+            json.dump([], chat_history_file)
+
     def __str__(self) -> str:
         return f"ChatContext(storage_path={self.storage_path})"

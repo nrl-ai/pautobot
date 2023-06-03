@@ -55,7 +55,7 @@ def main():
     async def ask(query: Query, background_tasks: BackgroundTasks):
         engine.check_query(query.mode, query.query)
         if engine.context.current_answer["status"] == BotStatus.THINKING:
-            raise Exception("I am still thinking! Please wait.")
+            raise SystemError("I am still thinking! Please wait.")
         engine.context.current_answer = {
             "status": BotStatus.THINKING,
             "answer": "",
@@ -68,9 +68,14 @@ def main():
     async def get_answer():
         return engine.get_answer()
 
-    @app.post("/api/get_chat_history")
+    @app.get("/api/chat_history")
     async def get_chat_history():
         return engine.get_chat_history()
+
+    @app.delete("/api/chat_history")
+    async def clear_chat_history():
+        engine.clear_chat_history()
+        return {"message": "Chat history cleared"}
 
     app.mount(
         "/", StaticFiles(directory=static_folder, html=True), name="static"

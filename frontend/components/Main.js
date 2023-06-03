@@ -3,29 +3,24 @@ import React, { useState, useRef, useEffect } from "react";
 import { toast } from "react-toastify";
 import NewMessage from "./NewMessage";
 
+import { getChatHistory } from "../lib/requests/chat";
+
 export default function Main() {
   const [messages, setMessages] = useState([]);
   const [thinking, setThinking] = useState(false);
   const messageBottomRef = useRef(null);
 
   useEffect(() => {
-    const localData = localStorage.getItem("messages");
-    if (!localData) {
-      return;
-    }
-    let bkMessages = JSON.parse(localData);
-    // Remove last message if it is "Thinking..."
-    if (bkMessages && bkMessages.length > 0) {
-      if (bkMessages[bkMessages.length - 1].answer === "Thinking...") {
-        bkMessages.pop();
+    getChatHistory().then(async (response) => {
+      let data = await response.json();
+      if (!response.ok) {
+        const error = (data && data.message) || response.status;
+        return Promise.reject(error);
       }
-    }
-    setMessages(bkMessages);
+      setMessages(data);
+      console.log(data);
+    });
   }, []);
-
-  const saveMessages = (messages) => {
-    localStorage.setItem("messages", JSON.stringify(messages));
-  };
 
   const onSubmitMessage = (mode, message) => {
     if (thinking) {
@@ -39,7 +34,6 @@ export default function Main() {
       { answer: "Thinking..." },
     ];
     setMessages(newMessages);
-    saveMessages(newMessages);
     // Scroll to bottom
     setTimeout(() => {
       messageBottomRef.current.scrollTop =
@@ -81,7 +75,6 @@ export default function Main() {
                 { answer: data.answer, docs: null },
               ];
               setMessages(newMessages);
-              saveMessages(newMessages);
               setTimeout(() => {
                 messageBottomRef.current.scrollIntoView({ behavior: "smooth" });
               }, 500);
@@ -93,7 +86,6 @@ export default function Main() {
                 { answer: data.answer, docs: data.docs },
               ];
               setMessages(newMessages);
-              saveMessages(newMessages);
               setTimeout(() => {
                 messageBottomRef.current.scrollIntoView({ behavior: "smooth" });
               }, 500);

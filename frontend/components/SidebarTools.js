@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import { useState, useRef, useEffect } from "react";
 
 import { openDocumentsFolder } from "@/utils";
+import { clearChatHistory } from "@/lib/requests/chat";
 
 function LoadingIcon() {
   return (
@@ -292,8 +293,10 @@ export default function SidebarTools() {
         <button
           className="w-full text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
           onClick={() => {
-            localStorage.setItem("messages", JSON.stringify([]));
-            window.location.reload();
+            clearChatHistory().then(() => {
+              toast.success("Chat history cleared!");
+              window.location.reload();
+            });
           }}
         >
           Clear History

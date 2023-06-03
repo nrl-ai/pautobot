@@ -57,6 +57,14 @@ class PautoBotEngine:
         """Get the bot's documents."""
         return self.context.get_documents()
 
+    def get_chat_history(self):
+        """Get the bot's chat history."""
+        return self.context.get_chat_history()
+
+    def clear_chat_history(self):
+        """Clear the bot's chat history."""
+        self.context.clear_chat_history()
+
     def ingest_documents(self):
         """Ingest the bot's documents."""
         ingest_documents(
@@ -101,6 +109,12 @@ class PautoBotEngine:
             "answer": "",
             "docs": [],
         }
+        self.context.write_chat_history(
+            {
+                "query": query,
+                "mode": mode,
+            }
+        )
         if mode == BotMode.QA.value:
             try:
                 print("Received query: ", query)
@@ -123,6 +137,7 @@ class PautoBotEngine:
                     "answer": answer,
                     "docs": doc_json,
                 }
+                self.context.write_chat_history(self.context.current_answer)
             except Exception as e:
                 print("Error during thinking: ", e)
                 answer = "Error during thinking! Please try again."
@@ -133,6 +148,7 @@ class PautoBotEngine:
                     "answer": answer,
                     "docs": None,
                 }
+                self.context.write_chat_history(self.context.current_answer)
         else:
             try:
                 print("Received query: ", query)
@@ -144,6 +160,7 @@ class PautoBotEngine:
                     "answer": answer,
                     "docs": None,
                 }
+                self.context.write_chat_history(self.context.current_answer)
             except Exception as e:
                 print("Error during thinking: ", e)
                 self.context.current_answer = {
@@ -151,6 +168,7 @@ class PautoBotEngine:
                     "answer": "Error during thinking! Please try again.",
                     "docs": None,
                 }
+                self.context.write_chat_history(self.context.current_answer)
 
     def get_answer(self):
         return self.context.current_answer
