@@ -29,9 +29,9 @@
 - `.ppt` : PowerPoint Document,
 - `.txt`: Text file (UTF-8),
 
-# I. Installation and Usage
+## I. Installation and Usage
 
-## 1. Installation
+### 1. Installation
 
 - Python 3.8 or higher.
 - Install **PAutoBot**:
@@ -40,7 +40,7 @@
 pip install pautobot
 ```
 
-### For Windows 10/11
+#### For Windows 10/11
 
 To install a C++ compiler on Windows 10/11, follow these steps:
 
@@ -51,13 +51,13 @@ To install a C++ compiler on Windows 10/11, follow these steps:
 3. Download the MinGW installer from the [MinGW website](https://sourceforge.net/projects/mingw/).
 4. Run the installer and select the `gcc` component.
 
-### Mac Running Intel
+#### Mac Running Intel
 
 When running a Mac with Intel hardware (not M1), you may run into _clang: error: the clang compiler does not support '-march=native'_ during pip install.
 
 If so set your archflags during pip install. eg: _ARCHFLAGS="-arch x86_64" pip3 install -r requirements.txt_
 
-## 2. Usage
+### 2. Usage
 
 - Run the app:
 
@@ -70,3 +70,39 @@ python -m pautobot.app
   - **Chat + QA**
 - Upload some documents to the app (see the supported extensions above).
 - Ingest documents with **Ingest Data** button.
+
+## II. Development
+
+### 1. Run your backend
+
+- Python 3.8 or higher.
+- Install the dependencies:
+
+```shell
+pip install -r requirements.txt
+```
+
+- Run the app:
+
+```shell
+python -m pautobot.app
+```
+
+- Go to <http://localhost:5678/> to see the user interface.
+
+### 2. Run your frontend
+
+- Install the dependencies:
+
+```shell
+cd frontend
+npm install
+```
+
+- Run the app:
+
+```shell
+npm run dev
+```
+
+- Go to <http://localhost:3000/> to see the user interface. Use this address to develop the frontend.
