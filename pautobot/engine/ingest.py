@@ -1,10 +1,10 @@
-import os
 import glob
-from typing import List
+import os
 from multiprocessing import Pool
-from tqdm import tqdm
-from chromadb.config import Settings
+from typing import List
 
+from chromadb.config import Settings
+from langchain.docstore.document import Document
 from langchain.document_loaders import (
     CSVLoader,
     EverNoteLoader,
@@ -18,11 +18,10 @@ from langchain.document_loaders import (
     UnstructuredPowerPointLoader,
     UnstructuredWordDocumentLoader,
 )
-
+from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
-from langchain.embeddings import HuggingFaceEmbeddings
-from langchain.docstore.document import Document
+from tqdm import tqdm
 
 chunk_size = 500
 chunk_overlap = 50

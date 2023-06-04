@@ -1,14 +1,14 @@
+import copy
+import datetime
+import json
 import os
 import pathlib
-import json
-import copy
-import uuid
 import shutil
+import uuid
 
-import datetime
-
-from pautobot.bot_enums import BotMode, BotStatus
 from pautobot.app_info import DATA_ROOT
+from pautobot.engine.bot_enums import BotMode, BotStatus
+from pautobot.utils import open_file
 
 DEFAULT_ANSWER = {
     "status": BotStatus.READY,
@@ -18,8 +18,10 @@ DEFAULT_ANSWER = {
 
 
 class BotContext:
-    def __init__(self, storage_path) -> None:
+    def __init__(self, id, storage_path, name=None) -> None:
         pathlib.Path(storage_path).mkdir(parents=True, exist_ok=True)
+        self.id = id
+        self.name = name or id
         self.storage_path = storage_path
         self.embeddings_model_name = "all-MiniLM-L6-v2"
         self.documents_directory = os.path.join(storage_path, "documents")
@@ -36,14 +38,16 @@ class BotContext:
     @staticmethod
     def get_default_bot_context():
         """Get the default bot context."""
-        return BotContext(os.path.join(DATA_ROOT, "contexts", "default"))
+        return BotContext(
+            "default", os.path.join(DATA_ROOT, "contexts", "default")
+        )
 
-    def get_info(self):
+    def get_info(self) -> dict:
         """Get the bot info."""
         with open(self.info_file, "r") as info_file:
             return json.load(info_file)
 
-    def initialize_bot_context(self):
+    def initialize_bot_context(self) -> None:
         """Initialize the bot context."""
         for directory in [
             self.documents_directory,
@@ -63,7 +67,7 @@ class BotContext:
                 info_file,
             )
 
-    def add_document(self, file: bytes):
+    def add_document(self, file: bytes) -> None:
         """Add a document to the bot's knowledge base."""
         pathlib.Path(self.documents_directory).mkdir(
             parents=True, exist_ok=True
@@ -83,7 +87,13 @@ class BotContext:
                 f'{{"source": "{file.filename}", "id": "{unique_file_id}"}}'
             )
 
-    def get_documents(self):
+    def delete_document(self, document_id: str) -> None:
+        """Delete a document from the bot's knowledge base."""
+        for filename in os.listdir(self.documents_directory):
+            if filename.startswith(document_id):
+                os.remove(os.path.join(self.documents_directory, filename))
+
+    def get_documents(self) -> list:
         """List all documents."""
         documents = []
         for filename in os.listdir(self.documents_directory):
@@ -95,7 +105,11 @@ class BotContext:
                     documents.append(metadata)
         return documents
 
-    def write_chat_history(self, chat_history: dict):
+    def open_documents_folder(self) -> None:
+        """Open the documents folder."""
+        open_file(self.documents_directory)
+
+    def write_chat_history(self, chat_history: dict) -> None:
         """Write a message to the bot's chat history."""
         with open(self.chat_history_file, "r") as chat_history_file:
             chat_history_list = json.load(chat_history_file)
@@ -103,15 +117,28 @@ class BotContext:
         with open(self.chat_history_file, "w") as chat_history_file:
             json.dump(chat_history_list, chat_history_file)
 
-    def get_chat_history(self):
+    def get_chat_history(self) -> list:
         """Get the bot's chat history."""
         with open(self.chat_history_file, "r") as chat_history_file:
             return json.load(chat_history_file)
 
-    def clear_chat_history(self):
+    def clear_chat_history(self) -> None:
         """Clear the bot's chat history."""
         with open(self.chat_history_file, "w") as chat_history_file:
             json.dump([], chat_history_file)
 
     def __str__(self) -> str:
         return f"ChatContext(storage_path={self.storage_path})"
+
+    def dict(self) -> dict:
+        return {
+            "id": self.id,
+            "name": self.name,
+            "storage_path": self.storage_path,
+            "embeddings_model_name": self.embeddings_model_name,
+            "documents_directory": self.documents_directory,
+            "search_db_directory": self.search_db_directory,
+            "chat_history_file": self.chat_history_file,
+            "chat_files_directory": self.chat_files_directory,
+            "info_file": self.info_file,
+        }

@@ -1,17 +1,20 @@
 import os
 
-from pautobot.bot_enums import BotMode, BotStatus
-from pautobot.llm_factory import LLMFactory, ChatbotFactory, QAFactory
-from pautobot.ingest import ingest_documents
-from pautobot.utils import open_file
-from pautobot.bot_context import BotContext
 from pautobot.app_info import DATA_ROOT
+from pautobot.engine.bot_enums import BotMode, BotStatus
+from pautobot.engine.chatbot_factory import ChatbotFactory
+from pautobot.engine.context_manager import ContextManager
+from pautobot.engine.ingest import ingest_documents
+from pautobot.engine.llm_factory import LLMFactory
+from pautobot.engine.qa_factory import QAFactory
 
 
 class PautoBotEngine:
     """PautoBot engine for answering questions."""
 
-    def __init__(self, mode, model_type="GPT4All") -> None:
+    def __init__(
+        self, mode, context_manager: ContextManager, model_type="GPT4All"
+    ) -> None:
         self.mode = mode
         self.model_type = model_type
         self.model_path = os.path.join(
@@ -19,9 +22,12 @@ class PautoBotEngine:
             "models",
             "ggml-gpt4all-j-v1.3-groovy.bin",
         )
-
-        # Prepare the bot context
-        self.context = BotContext.get_default_bot_context()
+        self.context_manager = context_manager
+        if not self.context_manager.get_contexts():
+            raise ValueError(
+                "No contexts found! Please create  at least one context first."
+            )
+        self.context = self.context_manager.get_current_context()
 
         # Prepare the LLM
         self.model_n_ctx = 1000
@@ -40,33 +46,16 @@ class PautoBotEngine:
         if mode == BotMode.CHAT.value:
             return
         try:
-            self.qa_instance = QAFactory.create_qa(
-                context=self.context,
-                llm=self.llm,
-            )
+            self.ingest_documents()
         except Exception as e:
             print(f"Error while initializing retriever: {e}")
             print("Switching to chat mode...")
             self.qa_instance_error = "Error while initializing retriever!"
 
-    def add_document(self, file: bytes):
-        """Add a document to the bot's knowledge base."""
-        self.context.add_document(file)
-
-    def get_documents(self):
-        """Get the bot's documents."""
-        return self.context.get_documents()
-
-    def get_chat_history(self):
-        """Get the bot's chat history."""
-        return self.context.get_chat_history()
-
-    def clear_chat_history(self):
-        """Clear the bot's chat history."""
-        self.context.clear_chat_history()
-
-    def ingest_documents(self):
+    def ingest_documents(self, context_id=None) -> None:
         """Ingest the bot's documents."""
+        if context_id is not None:
+            self.switch_context(context_id)
         ingest_documents(
             self.context.documents_directory,
             self.context.search_db_directory,
@@ -78,14 +67,22 @@ class PautoBotEngine:
             llm=self.llm,
         )
 
-    def open_in_file_explorer(self):
-        """Open the bot's documents directory in the file explorer."""
-        open_file(self.context.documents_directory)
+    def switch_context(self, context_id: str) -> None:
+        """Switch the bot context if needed."""
+        if self.context.id != context_id:
+            self.context = self.context_manager.get_context(context_id)
+            self.qa_instance = QAFactory.create_qa(
+                context=self.context,
+                llm=self.llm,
+            )
 
-    def check_query(self, mode, query):
-        """Check if the query is valid.
+    def check_query(self, mode, query, context_id=None) -> None:
+        """
+        Check if the query is valid.
         Raises an exception on invalid query.
         """
+        if context_id is not None:
+            self.switch_context(context_id)
         if not query:
             raise ValueError("Query cannot be empty!")
         if mode == BotMode.QA.value and self.mode == BotMode.CHAT.value:
@@ -96,8 +93,10 @@ class PautoBotEngine:
         elif mode == BotMode.QA.value and self.qa_instance is None:
             raise ValueError(self.qa_instance_error)
 
-    def query(self, mode, query):
+    def query(self, mode, query, context_id=None) -> None:
         """Query the bot."""
+        if context_id is not None:
+            self.switch_context(context_id)
         self.check_query(mode, query)
         if mode is None:
             mode = self.mode
@@ -170,5 +169,8 @@ class PautoBotEngine:
                 }
                 self.context.write_chat_history(self.context.current_answer)
 
-    def get_answer(self):
+    def get_answer(self, context_id=None) -> dict:
+        """Get the bot's answer."""
+        if context_id is not None:
+            self.switch_context(context_id)
         return self.context.current_answer

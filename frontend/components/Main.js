@@ -18,7 +18,6 @@ export default function Main() {
         return Promise.reject(error);
       }
       setMessages(data);
-      console.log(data);
     });
   }, []);
 
@@ -40,8 +39,8 @@ export default function Main() {
         messageBottomRef.current.scrollHeight;
     }, 500);
 
-    // Submit to PrivateGPT /api/ask
-    fetch("/api/ask", {
+    // Submit to PrivateGPT /api/default/ask
+    fetch("/api/default/ask", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -57,7 +56,7 @@ export default function Main() {
 
         // Query data from /api/get_answer
         const interval = setInterval(async () => {
-          fetch("/api/get_answer", {
+          fetch("/api/default/get_answer", {
             method: "GET",
             headers: {
               "Content-Type": "application/json",

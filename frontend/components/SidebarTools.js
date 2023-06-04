@@ -12,7 +12,7 @@ function LoadingIcon() {
     <svg
       aria-hidden="true"
       role="status"
-      className="inline w-4 h-4 mr-3 text-gray-200 animate-spin dark:text-gray-600 ml-2"
+      className="inline w-4 h-4 mr-3 text-gray-200 animate-spin ml-2"
       viewBox="0 0 100 101"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -54,7 +54,7 @@ export default function SidebarTools() {
   const [documents, setDocuments] = useState([]);
 
   const refetchDocuments = () => {
-    fetch("/api/get_documents", {
+    fetch("/api/default/documents", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -82,7 +82,6 @@ export default function SidebarTools() {
   const checkAndRejectFile = (file) => {
     let fileExtension = file.name?.split(".")?.pop();
     fileExtension = fileExtension?.toLowerCase();
-    console.log(fileExtension);
     if (!fileExtension || !SUPPORTED_FILE_TYPES.includes(fileExtension)) {
       toast.error("Unsupported file type!");
       setFile(null);
@@ -96,7 +95,7 @@ export default function SidebarTools() {
     setUploading(true);
     const formData = new FormData();
     formData.append("file", file);
-    fetch("/api/upload", {
+    fetch("/api/default/documents", {
       method: "POST",
       body: formData,
     })
@@ -126,7 +125,7 @@ export default function SidebarTools() {
   const ingestData = () => {
     setIngesting(true);
     toast.info("Ingesting your data...");
-    fetch("/api/ingest", {
+    fetch("/api/default/documents/ingest", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -174,7 +173,7 @@ export default function SidebarTools() {
             )}
           </div>
           <div
-            className="flex flex-col items-center justify-center w-full h-36 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600 p-3 relative"
+            className="flex flex-col items-center justify-center w-full h-36 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 p-3 relative"
             onDragOver={(e) => {
               e.stopPropagation();
               e.preventDefault();
@@ -222,14 +221,14 @@ export default function SidebarTools() {
                   >
                     <path d="M320 464c8.8 0 16-7.2 16-16V160H256c-17.7 0-32-14.3-32-32V48H64c-8.8 0-16 7.2-16 16V448c0 8.8 7.2 16 16 16H320zM0 64C0 28.7 28.7 0 64 0H229.5c17 0 33.3 6.7 45.3 18.7l90.5 90.5c12 12 18.7 28.3 18.7 45.3V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V64z" />
                   </svg>
-                  <p className="mb-2 text-sm text-gray-500 dark:text-gray-400 mt-4 truncate max-w-[200px]">
+                  <p className="mb-2 text-sm text-gray-500 mt-4 truncate max-w-[200px]">
                     {file.name}
                   </p>
                 </>
               ) : (
                 <>
                   <UploadIcon />
-                  <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                  <p className="mb-2 text-sm text-gray-500">
                     <span
                       className="font-semibold"
                       onClick={() => {
@@ -240,7 +239,7 @@ export default function SidebarTools() {
                     </span>{" "}
                     or drag and drop
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 max-w-[80%]">
+                  <p className="text-xs text-gray-500 max-w-[80%]">
                     ({SUPPORTED_FILE_TYPES.join(", ")})
                   </p>
                 </>
@@ -262,7 +261,7 @@ export default function SidebarTools() {
       <div className="mt-3">
         <button
           className={
-            "w-full text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700" +
+            "w-full text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2" +
             (uploading ? " opacity-80" : "")
           }
           onClick={() => {
@@ -279,7 +278,7 @@ export default function SidebarTools() {
         </button>
         <button
           className={
-            "w-full text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700" +
+            "w-full text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2" +
             (ingesting ? " opacity-80" : "")
           }
           onClick={() => {
@@ -291,7 +290,7 @@ export default function SidebarTools() {
           {ingesting ? <LoadingIcon /> : null}
         </button>
         <button
-          className="w-full text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
+          className="w-full text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2"
           onClick={() => {
             clearChatHistory().then(() => {
               toast.success("Chat history cleared!");
