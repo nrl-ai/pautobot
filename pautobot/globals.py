@@ -14,5 +14,6 @@ def init():
 
     context_manager = ContextManager()
     context_manager.register(BotContext.get_default_bot_context())
+    context_manager.load_from_disk()
 
     engine = PautoBotEngine(mode=BotMode.QA, context_manager=context_manager)

@@ -1,5 +1,4 @@
 import copy
-import datetime
 import json
 import os
 import pathlib
@@ -7,7 +6,7 @@ import shutil
 import uuid
 
 from pautobot.app_info import DATA_ROOT
-from pautobot.engine.bot_enums import BotMode, BotStatus
+from pautobot.engine.bot_enums import BotStatus
 from pautobot.utils import open_file
 
 DEFAULT_ANSWER = {
@@ -18,10 +17,18 @@ DEFAULT_ANSWER = {
 
 
 class BotContext:
-    def __init__(self, id, storage_path, name=None) -> None:
+    def __init__(
+        self, id=None, name=None, storage_path=None, *args, **kwargs
+    ) -> None:
+        if id is None:
+            id = str(uuid.uuid4())
+        if name is None:
+            name = id
+        if storage_path is None:
+            storage_path = os.path.join(DATA_ROOT, "contexts", id)
         pathlib.Path(storage_path).mkdir(parents=True, exist_ok=True)
         self.id = id
-        self.name = name or id
+        self.name = name
         self.storage_path = storage_path
         self.embeddings_model_name = "all-MiniLM-L6-v2"
         self.documents_directory = os.path.join(storage_path, "documents")
@@ -35,12 +42,32 @@ class BotContext:
             self.initialize_bot_context()
         self.current_answer = copy.deepcopy(DEFAULT_ANSWER)
 
+    def save(self) -> None:
+        """Save the bot context."""
+        with open(self.info_file, "w") as info_file:
+            json.dump(
+                self.dict(),
+                info_file,
+            )
+
+    @staticmethod
+    def load_from_file(info_file: str) -> "BotContext":
+        """Load a bot context from a file."""
+        with open(info_file, "r") as info_file:
+            info = json.load(info_file)
+        return BotContext(**info)
+
+    @staticmethod
+    def load_from_folder(context_folder: str) -> "BotContext":
+        """Load a bot context from a folder."""
+        return BotContext.load_from_file(
+            os.path.join(context_folder, "info.json")
+        )
+
     @staticmethod
     def get_default_bot_context():
         """Get the default bot context."""
-        return BotContext(
-            "default", os.path.join(DATA_ROOT, "contexts", "default")
-        )
+        return BotContext(id="default", name="Default")
 
     def get_info(self) -> dict:
         """Get the bot info."""
@@ -57,15 +84,12 @@ class BotContext:
             pathlib.Path(directory).mkdir(parents=True, exist_ok=True)
         with open(self.chat_history_file, "w") as chat_history_file:
             json.dump([], chat_history_file)
-        with open(self.info_file, "w") as info_file:
-            json.dump(
-                {
-                    "title": "Untitled",
-                    "created_date": datetime.datetime.now().isoformat(),
-                    "current_mode": BotMode.CHAT.value,
-                },
-                info_file,
-            )
+        self.save()
+
+    def rename(self, new_name: str) -> None:
+        """Rename the bot context."""
+        self.name = new_name
+        self.save()
 
     def add_document(self, file: bytes) -> None:
         """Add a document to the bot's knowledge base."""
