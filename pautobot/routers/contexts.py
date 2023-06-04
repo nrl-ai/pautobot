@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
 from pautobot import globals
+from pautobot.engine.bot_context import BotContext
 
 router = APIRouter(
     prefix="/api",
@@ -19,6 +20,45 @@ async def get_contexts():
     for context in contexts:
         context_list.append(contexts[context].dict())
     return context_list
+
+
+@router.get("/current_context")
+async def get_current_context():
+    """
+    Get the current chat context
+    """
+    return globals.context_manager.get_current_context().dict()
+
+
+@router.post("/contexts")
+async def create_context():
+    """
+    Create a new chat context
+    """
+    context = BotContext()
+    globals.context_manager.register(context)
+    return {
+        "message": "Context created",
+        "data": context.dict(),
+    }
+
+
+@router.delete("/contexts/{context_id}")
+async def delete_context(context_id: str):
+    """
+    Delete a chat context
+    """
+    globals.context_manager.delete_context(context_id)
+    return {"message": "Context deleted"}
+
+
+@router.put("/contexts/{context_id}")
+async def rename_context(context_id: str, new_name: str):
+    """
+    Rename a chat context
+    """
+    globals.context_manager.rename_context(context_id, new_name)
+    return {"message": "Context renamed"}
 
 
 @router.post("/set_context")
