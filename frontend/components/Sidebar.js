@@ -1,26 +1,29 @@
-import SidebarTools from "./SidebarTools";
-import ModelSelector from "./ModelSelector";
-import SidebarMenu from "./SidebarMenu";
+import SidebarTopMenu from "./SidebarTopMenu";
+import SidebarBottomMenu from "./SidebarBottomMenu";
 
 export default function Sidebar() {
   return (
     <>
-      <div className="p-2 h-full">
-        <div className="bg-gray-300 shadow-md w-full h-full pt-8 px-4 pb-4 rounded-2xl">
-          <div align="center" className="mb-4">
+      <div className="h-full shadow-md">
+        <div className="bg-[#007FF4] w-full h-full flex flex-col shadow-lg">
+          <div align="center" className="mb-16 pt-4 px-4 pb-4 grow-0">
             <img
               alt="PAutoBot"
-              className="w-12 h-auto mx-auto mb-2"
+              className="w-12 h-auto mx-auto mb-2 p-2 rotate-logo hover:rotate-0 transition bg-white rounded-md"
               src="/pautobot.png"
             />
-            <h1 align="center" className="text-3xl font-semibold">
-              🔥 PⒶutoBot 🔥
+            <h1 align="center" className="text-md font-semibold text-white">
+              PAuto
             </h1>
-            <p align="center">Your private task assistant with GPT</p>
           </div>
-          <SidebarMenu />
-          <ModelSelector />
-          <SidebarTools />
+          <div className="flex flex-col grow">
+            <div className="grow">
+              <SidebarTopMenu />
+            </div>
+            <div className="grow-0">
+              <SidebarBottomMenu />
+            </div>
+          </div>
         </div>
       </div>
     </>
