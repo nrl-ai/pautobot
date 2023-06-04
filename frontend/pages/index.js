@@ -1,19 +1,21 @@
 import Sidebar from "@components/Sidebar";
 import Main from "@components/Main";
 import { ToastContainer } from "react-toastify";
+import SidebarTools from "@components/SidebarTools";
 
 export default function Home() {
   return (
-    <>
-      <div className="relative w-full h-full">
-        <div className="fixed w-[400px] h-full top-0">
-          <Sidebar />
-        </div>
-        <div className="h-full fixed left-[400px] right-0 top-0 bottom-0 overflow-auto">
-          <Main />
-          <ToastContainer />
-        </div>
+    <div className="w-full h-screen flex flex-row">
+      <div className="h-screen grow-0">
+        <Sidebar />
       </div>
-    </>
+      <div className="h-screen overflow-auto grow relative">
+        <Main />
+        <ToastContainer />
+      </div>
+      <div className="h-screen grow-0 w-[360px] p-4 bg-gray-100 border-l-2">
+        <SidebarTools />
+      </div>
+    </div>
   );
 }
