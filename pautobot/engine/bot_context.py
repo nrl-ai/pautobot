@@ -107,8 +107,13 @@ class BotContext:
         with open(
             os.path.join(self.documents_directory, metadata_filename), "w"
         ) as metadata_file:
-            metadata_file.write(
-                f'{{"source": "{file.filename}", "id": "{unique_file_id}"}}'
+            json.dump(
+                {
+                    "id": str(unique_file_id),
+                    "source": file.filename,
+                    "filename": new_filename,
+                },
+                metadata_file,
             )
 
     def delete_document(self, document_id: str) -> None:
@@ -132,6 +137,19 @@ class BotContext:
     def open_documents_folder(self) -> None:
         """Open the documents folder."""
         open_file(self.documents_directory)
+
+    def open_document(self, document_id: str) -> None:
+        """Open a document."""
+        for filename in os.listdir(self.documents_directory):
+            if filename.startswith(document_id) and filename.endswith(".json"):
+                data = json.load(
+                    open(os.path.join(self.documents_directory, filename))
+                )
+                file_to_open = os.path.join(
+                    self.documents_directory, data["filename"]
+                )
+                print(file_to_open)
+                open_file(file_to_open)
 
     def write_chat_history(self, chat_history: dict) -> None:
         """Write a message to the bot's chat history."""
