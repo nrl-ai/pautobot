@@ -50,9 +50,9 @@ async def ingest_documents(context_id: str):
 
 
 @router.post("/{context_id}/documents/open_in_file_explorer")
-async def open_in_file_explorer(context_id: str):
+async def open_in_file_explorer(context_id: str, document_id: str):
     """
     Open the bot's context in the file explorer
     """
-    globals.context_manager.get_context(context_id).open_documents_folder()
+    globals.context_manager.get_context(context_id).open_document(document_id)
     return {"message": "Documents folder opened"}
