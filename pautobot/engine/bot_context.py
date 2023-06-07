@@ -91,18 +91,18 @@ class BotContext:
         self.name = new_name
         self.save()
 
-    def add_document(self, file: bytes) -> None:
+    def add_document(self, file, filename) -> None:
         """Add a document to the bot's knowledge base."""
         pathlib.Path(self.documents_directory).mkdir(
             parents=True, exist_ok=True
         )
-        file_extension = os.path.splitext(file.filename)[1]
+        file_extension = os.path.splitext(filename)[1]
         unique_file_id = uuid.uuid4()
         new_filename = f"{unique_file_id}.{file_extension}"
         with open(
             os.path.join(self.documents_directory, new_filename), "wb+"
         ) as destination:
-            shutil.copyfileobj(file.file, destination)
+            shutil.copyfileobj(file, destination)
         metadata_filename = f"{unique_file_id}.json"
         with open(
             os.path.join(self.documents_directory, metadata_filename), "w"
@@ -110,7 +110,7 @@ class BotContext:
             json.dump(
                 {
                     "id": str(unique_file_id),
-                    "source": file.filename,
+                    "source": filename,
                     "filename": new_filename,
                 },
                 metadata_file,

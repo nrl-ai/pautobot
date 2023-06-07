@@ -1,6 +1,11 @@
+import os
+import tempfile
+import zipfile
+
 from fastapi import APIRouter, File, UploadFile
 
 from pautobot import globals
+from pautobot.utils import SUPPORTED_DOCUMENT_TYPES
 
 router = APIRouter(
     prefix="/api",
@@ -23,10 +28,27 @@ async def upload_document(context_id: str, file: UploadFile = File(...)):
     """
     if not file:
         return {"message": "No file sent"}
-    else:
-        globals.context_manager.get_context(context_id).add_document(file)
-        return {"message": "File uploaded"}
 
+    file_extension = os.path.splitext(file.filename)[1]
+    print(file_extension)
+    if file_extension == ".zip":
+        tmp_dir = tempfile.mkdtemp()
+        tmp_zip_file = os.path.join(tmp_dir, file.filename)
+        with open(tmp_zip_file, "wb") as tmp_zip:
+            tmp_zip.write(file.file.read())
+        with zipfile.ZipFile(tmp_zip_file, "r") as zip_ref:
+            zip_ref.extractall(tmp_dir)
+        for filename in os.listdir(tmp_dir):
+            if os.path.splitext(filename)[1] in SUPPORTED_DOCUMENT_TYPES:
+                with open(os.path.join(tmp_dir, filename), "rb") as file:
+                    globals.context_manager.get_context(context_id).add_document(
+                        file, filename
+                    )
+        return {"message": "File uploaded"}
+    elif file_extension in SUPPORTED_DOCUMENT_TYPES:
+        globals.context_manager.get_context(context_id).add_document(file.file, file.filename)
+        return {"message": "File uploaded"}
+    raise Exception("Unsupported file type")
 
 @router.delete("/{context_id}/documents/{document_id}")
 async def delete_document(context_id: str, document_id: str):

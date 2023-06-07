@@ -102,8 +102,8 @@ export default function Main() {
 
   return (
     <>
-      <div className="flex flex-col h-full xl:max-w-[800px] xl:mx-auto">
-        <div className="mx-2 md:px-5 sm:py-4 flex-grow mb-[150px] pb-8 max-h-full pt-[50px] rounded-xl mt-8">
+      <div className="flex flex-col h-full xl:max-w-[800px] xl:mx-auto max-h-screen overflow-hidden">
+        <div className="mx-2 md:px-5 sm:py-4 pb-8 pt-[50px] rounded-xl mt-8 grow overflow-auto">
           <div className="text-black">
             {messages.map((message, index) => {
               if (message.query) {
@@ -161,7 +161,7 @@ export default function Main() {
             <div ref={messageBottomRef}></div>
           </div>
         </div>
-        <div className="w-full">
+        <div className="w-full grow-0">
           <NewMessage
             onSubmitMessage={(mode, message) => {
               onSubmitMessage(mode, message);

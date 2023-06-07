@@ -1,14 +1,31 @@
-import pkg_resources
 import os
-import shutil
 import pathlib
-import traceback
-import requests
 import platform
+import shutil
 import subprocess
-
 import tempfile
+import traceback
+
+import pkg_resources
+import requests
 from tqdm import tqdm
+
+SUPPORTED_DOCUMENT_TYPES = [
+    ".csv",
+    ".docx",
+    ".doc",
+    ".enex",
+    ".eml",
+    ".epub",
+    ".html",
+    ".md",
+    ".msg",
+    ".odt",
+    ".pdf",
+    ".pptx",
+    ".ppt",
+    ".txt",
+]
 
 
 def open_file(path):

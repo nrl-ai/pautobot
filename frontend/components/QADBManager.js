@@ -20,6 +20,7 @@ export default function ModelSelector() {
     "pptx",
     "ppt",
     "txt",
+    "zip",
   ];
 
   const [uploading, setUploading] = useState(false);
