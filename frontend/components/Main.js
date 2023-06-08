@@ -8,7 +8,13 @@ import { getChatHistory } from "../lib/requests/chat";
 export default function Main() {
   const [messages, setMessages] = useState([]);
   const [thinking, setThinking] = useState(false);
-  const messageBottomRef = useRef(null);
+  const messagesRef = useRef(null);
+
+  const scrollMessages = () => {
+    setTimeout(() => {
+      messagesRef.current.scrollTop = messagesRef.current.scrollHeight;
+    }, 300);
+  };
 
   useEffect(() => {
     getChatHistory().then(async (response) => {
@@ -18,6 +24,7 @@ export default function Main() {
         return Promise.reject(error);
       }
       setMessages(data);
+      scrollMessages();
     });
   }, []);
 
@@ -33,11 +40,7 @@ export default function Main() {
       { answer: "Thinking..." },
     ];
     setMessages(newMessages);
-    // Scroll to bottom
-    setTimeout(() => {
-      messageBottomRef.current.scrollTop =
-        messageBottomRef.current.scrollHeight;
-    }, 500);
+    scrollMessages();
 
     // Submit to PrivateGPT /api/default/ask
     fetch("/api/default/ask", {
@@ -74,9 +77,7 @@ export default function Main() {
                 { answer: data.answer, docs: null },
               ];
               setMessages(newMessages);
-              setTimeout(() => {
-                messageBottomRef.current.scrollIntoView({ behavior: "smooth" });
-              }, 500);
+              scrollMessages();
             } else if (data.status == "READY") {
               clearInterval(interval);
               newMessages.pop();
@@ -85,10 +86,8 @@ export default function Main() {
                 { answer: data.answer, docs: data.docs },
               ];
               setMessages(newMessages);
-              setTimeout(() => {
-                messageBottomRef.current.scrollIntoView({ behavior: "smooth" });
-              }, 500);
               setThinking(false);
+              scrollMessages();
             }
           });
         }, 2000);
@@ -103,7 +102,10 @@ export default function Main() {
   return (
     <>
       <div className="flex flex-col h-full xl:max-w-[800px] xl:mx-auto max-h-screen overflow-hidden">
-        <div className="mx-2 md:px-5 sm:py-4 pb-8 pt-[50px] rounded-xl mt-8 grow overflow-auto">
+        <div
+          ref={messagesRef}
+          className="mx-2 md:px-5 sm:py-4 pb-8 pt-[50px] rounded-xl mt-8 grow overflow-auto"
+        >
           <div className="text-black">
             {messages.map((message, index) => {
               if (message.query) {
@@ -158,7 +160,6 @@ export default function Main() {
                 </h3>
               </div>
             )}
-            <div ref={messageBottomRef}></div>
           </div>
         </div>
         <div className="w-full grow-0">
