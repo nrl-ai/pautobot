@@ -14,7 +14,7 @@ router = APIRouter(
 
 
 @router.get("/{context_id}/documents")
-async def get_documents(context_id: str):
+async def get_documents(context_id: int):
     """
     Get all documents in the bot's context
     """
@@ -22,7 +22,7 @@ async def get_documents(context_id: str):
 
 
 @router.post("/{context_id}/documents")
-async def upload_document(context_id: str, file: UploadFile = File(...)):
+async def upload_document(context_id: int, file: UploadFile = File(...)):
     """
     Upload a document to the bot's context
     """
@@ -53,7 +53,7 @@ async def upload_document(context_id: str, file: UploadFile = File(...)):
 
 
 @router.delete("/{context_id}/documents/{document_id}")
-async def delete_document(context_id: str, document_id: str):
+async def delete_document(context_id: int, document_id: int):
     """
     Delete a document from the bot's context
     """
@@ -65,7 +65,7 @@ async def delete_document(context_id: str, document_id: str):
 
 
 @router.post("/{context_id}/documents/ingest")
-async def ingest_documents(context_id: str):
+async def ingest_documents(context_id: int):
     """
     Ingest all documents in the bot's context
     """
@@ -74,7 +74,7 @@ async def ingest_documents(context_id: str):
 
 
 @router.post("/{context_id}/documents/open_in_file_explorer")
-async def open_in_file_explorer(context_id: str, document_id: str):
+async def open_in_file_explorer(context_id: int, document_id: int):
     """
     Open the bot's context in the file explorer
     """

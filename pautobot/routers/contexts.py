@@ -44,7 +44,7 @@ async def create_context():
 
 
 @router.delete("/contexts/{context_id}")
-async def delete_context(context_id: str):
+async def delete_context(context_id: int):
     """
     Delete a chat context
     """
@@ -53,7 +53,7 @@ async def delete_context(context_id: str):
 
 
 @router.put("/contexts/{context_id}")
-async def rename_context(context_id: str, new_name: str):
+async def rename_context(context_id: int, new_name: str):
     """
     Rename a chat context
     """
@@ -62,7 +62,7 @@ async def rename_context(context_id: str, new_name: str):
 
 
 @router.post("/set_context")
-async def set_context(context_id: str):
+async def set_context(context_id: int):
     """
     Set the current context
     """
@@ -72,7 +72,7 @@ async def set_context(context_id: str):
 
 
 @router.get("/{context_id}/chat_history")
-async def get_chat_history(context_id: str):
+async def get_chat_history(context_id: int):
     """
     Get the bot's chat history
     """
@@ -80,7 +80,7 @@ async def get_chat_history(context_id: str):
 
 
 @router.delete("/{context_id}/chat_history")
-async def clear_chat_history(context_id: str):
+async def clear_chat_history(context_id: int):
     """
     Clear the bot's chat history
     """

@@ -9,7 +9,7 @@ export default function ModelSelector() {
   const ingestData = () => {
     setIngesting(true);
     toast.info("Ingesting your data...");
-    fetch("/api/default/documents/ingest", {
+    fetch("/api/0/documents/ingest", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

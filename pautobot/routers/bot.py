@@ -12,7 +12,7 @@ router = APIRouter(
 
 @router.post("/{context_id}/ask")
 async def ask(
-    context_id: str, query: Query, background_tasks: BackgroundTasks
+    context_id: int, query: Query, background_tasks: BackgroundTasks
 ):
     globals.engine.check_query(query.mode, query.query, context_id=context_id)
     if globals.engine.context.current_answer["status"] == BotStatus.THINKING:
@@ -27,5 +27,5 @@ async def ask(
 
 
 @router.get("/{context_id}/get_answer")
-async def get_answer(context_id: str):
+async def get_answer(context_id: int):
     return globals.engine.get_answer(context_id=context_id)
