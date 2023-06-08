@@ -1,7 +1,10 @@
+import logging
 import os
 import shutil
 
-from pautobot.app_info import DATA_ROOT
+from pautobot import db_models
+from pautobot.config import DATA_ROOT
+from pautobot.database import session
 from pautobot.engine.bot_context import BotContext
 
 
@@ -11,57 +14,47 @@ class ContextManager:
     """
 
     def __init__(self):
-        self._contexts = {}
         self._current_context = None
+        self._contexts = {}
 
-    def load_from_disk(self) -> None:
+    def load_contexts(self) -> None:
         """
-        Load all contexts from disk.
+        Load all contexts from the database.
         """
-        for context_id in os.listdir(os.path.join(DATA_ROOT, "contexts")):
-            path = os.path.join(DATA_ROOT, "contexts", context_id)
-            if os.path.isdir(path):
-                context = BotContext.load_from_folder(path)
-                self._contexts[context.id] = context
-        if self._contexts:
-            self._current_context = list(self._contexts.values())[0]
+        self._contexts = {0: BotContext(id=0, name="Default")}
+        self._current_context = self._contexts[0]
+        for context in session.query(db_models.BotContext).all():
+            self._contexts[context.id] = BotContext(id=context.id)
 
-    def register(self, context: BotContext) -> None:
-        """
-        Register a new context.
-        """
-        if context.id in self._contexts:
-            raise ValueError(f"Context {context.id} already exists!")
-        self._contexts[context.id] = context
-        if self._current_context is None:
-            self._current_context = context
-
-    def rename_context(self, context_id: str, new_name: str) -> None:
+    def rename_context(self, context_id: int, new_name: str) -> None:
         """
         Rename a context.
         """
         if context_id not in self._contexts:
             raise ValueError(f"Context {context_id} not found!")
-        self._contexts[context_id].rename(new_name)
+        session.query(db_models.BotContext).filter_by(id=context_id).update(
+            {"name": new_name}
+        )
+        session.commit()
 
-    def delete_context(self, context_id: str) -> None:
+    def delete_context(self, context_id: int) -> None:
         """
         Completely delete a context.
         """
         if context_id not in self._contexts:
             raise ValueError(f"Context {context_id} not found!")
+        if context_id in self._contexts:
+            del self._contexts[context_id]
+        try:
+            session.query(db_models.BotContext).filter_by(
+                id=context_id
+            ).delete()
+            session.commit()
+            shutil.rmtree(os.path.join(DATA_ROOT, "contexts", str(context_id)))
+        except Exception as e:
+            logging.error(f"Error while deleting context {context_id}: {e}")
 
-        # Delete the context
-        to_be_deleted = self._contexts[context_id]
-        del self._contexts[context_id]
-        shutil.rmtree(to_be_deleted.storage_path)
-
-        if not self._contexts:
-            self._current_context = None
-        else:
-            self._current_context = list(self._contexts.values())[0]
-
-    def get_context(self, context_id: str) -> BotContext:
+    def get_context(self, context_id: int) -> BotContext:
         """
         Get a context by its ID.
         """
@@ -75,7 +68,7 @@ class ContextManager:
         """
         return self._contexts
 
-    def set_current_context(self, context_id: str) -> None:
+    def set_current_context(self, context_id: int) -> None:
         """
         Set the current context.
         """

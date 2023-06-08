@@ -28,7 +28,7 @@ export default function ModelSelector() {
   const [documents, setDocuments] = useState([]);
 
   const refetchDocuments = () => {
-    fetch("/api/default/documents", {
+    fetch("/api/0/documents", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -70,7 +70,7 @@ export default function ModelSelector() {
     setUploading(true);
     const formData = new FormData();
     formData.append("file", file);
-    fetch("/api/default/documents", {
+    fetch("/api/0/documents", {
       method: "POST",
       body: formData,
     })
@@ -114,7 +114,7 @@ export default function ModelSelector() {
               <tr key={document.id} className="bg-white dark:bg-gray-700">
                 <td className="pl-2">{key + 1}.</td>
                 <td className="px-0 py-1.5 whitespace-nowrap max-w-[150px] overflow-hidden">
-                  {document.source}
+                  {document.name}
                 </td>
                 <td className="pl-2 whitespace-nowrap">
                   <button

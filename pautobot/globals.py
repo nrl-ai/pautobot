@@ -1,5 +1,4 @@
 from pautobot.engine import PautoBotEngine
-from pautobot.engine.bot_context import BotContext
 from pautobot.engine.bot_enums import BotMode
 from pautobot.engine.context_manager import ContextManager
 
@@ -13,7 +12,6 @@ def init():
     global engine
 
     context_manager = ContextManager()
-    context_manager.register(BotContext.get_default_bot_context())
-    context_manager.load_from_disk()
+    context_manager.load_contexts()
 
     engine = PautoBotEngine(mode=BotMode.QA, context_manager=context_manager)

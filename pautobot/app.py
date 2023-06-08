@@ -1,18 +1,20 @@
-import os
-
-os.environ["TOKENIZERS_PARALLELISM"] = "false"
-
 import logging
+import os
 
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
+from pautobot import db_models as models
 from pautobot import globals
-from pautobot.app_info import DATA_ROOT, __appname__, __description__, __version__
+from pautobot.app_info import __appname__, __description__, __version__
+from pautobot.config import DATA_ROOT
+from pautobot.database import engine
 from pautobot.routers import bot, contexts, documents
 from pautobot.utils import extract_frontend_dist
+
+models.Base.metadata.create_all(bind=engine)
 
 
 def main():

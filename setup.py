@@ -19,10 +19,10 @@ def get_version():
 def get_install_requires():
     """Get python requirements based on context"""
     install_requires = [
-        "langchain>=0.0.177",
-        "gpt4all>=0.2.3",
+        "langchain>=0.0.194",
+        "gpt4all>=0.3.0",
         "chromadb>=0.3.23",
-        "llama-cpp-python>=0.1.50",
+        "llama-cpp-python>=0.1.59",
         "urllib3>=2.0.2",
         "pdfminer.six>=20221105",
         "unstructured>=0.6.6",
@@ -32,7 +32,9 @@ def get_install_requires():
         "pypandoc>=1.11",
         "tqdm>=4.65.0",
         "python-multipart>=0.0.6",
-        "fastapi",
+        "fastapi==0.96.0",
+        "SQLAlchemy==2.0.15",
+        "alembic==1.11.1",
         "requests",
     ]
 

@@ -1,14 +1,11 @@
 export const openDocument = (document_id) => {
-  fetch(
-    "/api/default/documents/open_in_file_explorer?document_id=" + document_id,
-    {
-      method: "POST",
-    }
-  );
+  fetch("/api/0/documents/open_in_file_explorer?document_id=" + document_id, {
+    method: "POST",
+  });
 };
 
 export const deleteDocument = (document_id, callbackSuccess, callbackError) => {
-  fetch(`/api/default/documents/${document_id}`, {
+  fetch(`/api/0/documents/${document_id}`, {
     method: "DELETE",
   })
     .then(async (response) => {

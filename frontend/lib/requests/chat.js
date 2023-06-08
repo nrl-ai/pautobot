@@ -1,5 +1,5 @@
 export const getChatHistory = () => {
-  const response = fetch("/api/default/chat_history", {
+  const response = fetch("/api/0/chat_history", {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -9,7 +9,7 @@ export const getChatHistory = () => {
 };
 
 export const clearChatHistory = () => {
-  const response = fetch("/api/default/chat_history", {
+  const response = fetch("/api/0/chat_history", {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",

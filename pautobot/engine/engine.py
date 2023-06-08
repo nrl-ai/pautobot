@@ -1,7 +1,10 @@
 import logging
 import os
+import traceback
 
-from pautobot.app_info import DATA_ROOT
+from pautobot import db_models
+from pautobot.config import DATA_ROOT
+from pautobot.database import session
 from pautobot.engine.bot_enums import BotMode, BotStatus
 from pautobot.engine.chatbot_factory import ChatbotFactory
 from pautobot.engine.context_manager import ContextManager
@@ -68,7 +71,7 @@ class PautoBotEngine:
             llm=self.llm,
         )
 
-    def switch_context(self, context_id: str) -> None:
+    def switch_context(self, context_id: int) -> None:
         """Switch the bot context if needed."""
         if self.context.id != context_id:
             self.context = self.context_manager.get_context(context_id)
@@ -126,9 +129,17 @@ class PautoBotEngine:
                 )
                 doc_json = []
                 for document in docs:
+                    document_file = document.metadata["source"]
+                    document_id = os.path.basename(document_file).split(".")[0]
+                    document_id = int(document_id)
+                    db_document = (
+                        session.query(db_models.Document)
+                        .filter(db_models.Document.id == document_id)
+                        .first()
+                    )
                     doc_json.append(
                         {
-                            "source": document.metadata["source"],
+                            "source": db_document.name,
                             "content": document.page_content,
                         }
                     )
@@ -139,7 +150,8 @@ class PautoBotEngine:
                 }
                 self.context.write_chat_history(self.context.current_answer)
             except Exception as e:
-                logging.info("Error during thinking: ", e)
+                logging.error("Error during thinking: ", e)
+                traceback.print_exc()
                 answer = "Error during thinking! Please try again."
                 if "Index not found" in str(e):
                     answer = "Index not found! Please ingest documents first."
@@ -162,7 +174,8 @@ class PautoBotEngine:
                 }
                 self.context.write_chat_history(self.context.current_answer)
             except Exception as e:
-                logging.info("Error during thinking: ", e)
+                logging.error("Error during thinking: ", e)
+                traceback.print_exc()
                 self.context.current_answer = {
                     "status": BotStatus.READY,
                     "answer": "Error during thinking! Please try again.",

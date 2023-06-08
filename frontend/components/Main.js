@@ -42,8 +42,8 @@ export default function Main() {
     setMessages(newMessages);
     scrollMessages();
 
-    // Submit to PrivateGPT /api/default/ask
-    fetch("/api/default/ask", {
+    // Submit to PrivateGPT /api/0/ask
+    fetch("/api/0/ask", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -59,7 +59,7 @@ export default function Main() {
 
         // Query data from /api/get_answer
         const interval = setInterval(async () => {
-          fetch("/api/default/get_answer", {
+          fetch("/api/0/get_answer", {
             method: "GET",
             headers: {
               "Content-Type": "application/json",

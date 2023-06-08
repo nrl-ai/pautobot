@@ -1,12 +1,13 @@
 import copy
 import json
-import logging
 import os
 import pathlib
 import shutil
 import uuid
 
-from pautobot.app_info import DATA_ROOT
+from pautobot import db_models
+from pautobot.config import DATA_ROOT
+from pautobot.database import session
 from pautobot.engine.bot_enums import BotStatus
 from pautobot.utils import open_file
 
@@ -22,11 +23,19 @@ class BotContext:
         self, id=None, name=None, storage_path=None, *args, **kwargs
     ) -> None:
         if id is None:
-            id = str(uuid.uuid4())
-        if name is None:
-            name = id
+            id = 0
+        db_bot_context = (
+            session.query(db_models.BotContext).filter_by(id=id).first()
+        )
+        if db_bot_context is None:
+            if name is None:
+                name = str(uuid.uuid4())
+            db_bot_context = db_models.BotContext(id=id, name=name)
+            session.add(db_bot_context)
+            session.commit()
+        name = db_bot_context.name
         if storage_path is None:
-            storage_path = os.path.join(DATA_ROOT, "contexts", id)
+            storage_path = os.path.join(DATA_ROOT, "contexts", str(id))
         pathlib.Path(storage_path).mkdir(parents=True, exist_ok=True)
         self.id = id
         self.name = name
@@ -34,46 +43,23 @@ class BotContext:
         self.embeddings_model_name = "all-MiniLM-L6-v2"
         self.documents_directory = os.path.join(storage_path, "documents")
         self.search_db_directory = os.path.join(storage_path, "search_db")
-        self.chat_history_file = os.path.join(
-            storage_path, "chat_history.json"
-        )
         self.chat_files_directory = os.path.join(storage_path, "chat_files")
         self.info_file = os.path.join(storage_path, "info.json")
         if not os.path.exists(self.info_file):
             self.initialize_bot_context()
         self.current_answer = copy.deepcopy(DEFAULT_ANSWER)
 
-    def save(self) -> None:
-        """Save the bot context."""
-        with open(self.info_file, "w") as info_file:
-            json.dump(
-                self.dict(),
-                info_file,
-            )
-
-    @staticmethod
-    def load_from_file(info_file: str) -> "BotContext":
-        """Load a bot context from a file."""
-        with open(info_file, "r") as info_file:
-            info = json.load(info_file)
-        return BotContext(**info)
-
-    @staticmethod
-    def load_from_folder(context_folder: str) -> "BotContext":
-        """Load a bot context from a folder."""
-        return BotContext.load_from_file(
-            os.path.join(context_folder, "info.json")
-        )
-
     @staticmethod
     def get_default_bot_context():
         """Get the default bot context."""
-        return BotContext(id="default", name="Default")
+        return BotContext(id=0, name="Default")
 
     def get_info(self) -> dict:
         """Get the bot info."""
-        with open(self.info_file, "r") as info_file:
-            return json.load(info_file)
+        return {
+            "id": self.id,
+            "name": self.name,
+        }
 
     def initialize_bot_context(self) -> None:
         """Initialize the bot context."""
@@ -83,14 +69,14 @@ class BotContext:
             self.chat_files_directory,
         ]:
             pathlib.Path(directory).mkdir(parents=True, exist_ok=True)
-        with open(self.chat_history_file, "w") as chat_history_file:
-            json.dump([], chat_history_file)
-        self.save()
 
     def rename(self, new_name: str) -> None:
         """Rename the bot context."""
-        self.name = new_name
-        self.save()
+        db_bot_context = (
+            session.query(db_models.BotContext).filter_by(id=self.id).first()
+        )
+        db_bot_context.name = new_name
+        session.commit()
 
     def add_document(self, file, filename) -> None:
         """Add a document to the bot's knowledge base."""
@@ -98,77 +84,97 @@ class BotContext:
             parents=True, exist_ok=True
         )
         file_extension = os.path.splitext(filename)[1]
-        unique_file_id = uuid.uuid4()
-        new_filename = f"{unique_file_id}.{file_extension}"
+
+        # Create a new document in the database
+        db_document = db_models.Document(bot_context_id=self.id, name=filename)
+        session.add(db_document)
+        session.commit()
+        document_id = db_document.id
+
+        new_filename = f"{document_id}{file_extension}"
         with open(
             os.path.join(self.documents_directory, new_filename), "wb+"
         ) as destination:
             shutil.copyfileobj(file, destination)
-        metadata_filename = f"{unique_file_id}.json"
-        with open(
-            os.path.join(self.documents_directory, metadata_filename), "w"
-        ) as metadata_file:
-            json.dump(
-                {
-                    "id": str(unique_file_id),
-                    "source": filename,
-                    "filename": new_filename,
-                },
-                metadata_file,
-            )
 
-    def delete_document(self, document_id: str) -> None:
+        db_document.storage_name = new_filename
+        session.commit()
+
+    def delete_document(self, document_id: int) -> None:
         """Delete a document from the bot's knowledge base."""
-        for filename in os.listdir(self.documents_directory):
-            if filename.startswith(document_id):
-                os.remove(os.path.join(self.documents_directory, filename))
+        db_document = (
+            session.query(db_models.Document)
+            .filter_by(bot_context_id=self.id, id=document_id)
+            .first()
+        )
+        if db_document is None:
+            raise ValueError(f"Document with id {document_id} not found.")
+        os.remove(
+            os.path.join(self.documents_directory, db_document.storage_name)
+        )
+        session.delete(db_document)
+        session.commit()
 
     def get_documents(self) -> list:
         """List all documents."""
         documents = []
-        for filename in os.listdir(self.documents_directory):
-            if filename.endswith(".json"):
-                with open(
-                    os.path.join(self.documents_directory, filename), "r"
-                ) as metadata_file:
-                    metadata = json.load(metadata_file)
-                    documents.append(metadata)
+        for db_document in (
+            session.query(db_models.Document)
+            .filter_by(bot_context_id=self.id)
+            .all()
+        ):
+            documents.append(
+                {
+                    "id": db_document.id,
+                    "name": db_document.name,
+                    "storage_name": db_document.storage_name,
+                }
+            )
         return documents
 
     def open_documents_folder(self) -> None:
         """Open the documents folder."""
         open_file(self.documents_directory)
 
-    def open_document(self, document_id: str) -> None:
+    def open_document(self, document_id: int) -> None:
         """Open a document."""
-        for filename in os.listdir(self.documents_directory):
-            if filename.startswith(document_id) and filename.endswith(".json"):
-                data = json.load(
-                    open(os.path.join(self.documents_directory, filename))
-                )
-                file_to_open = os.path.join(
-                    self.documents_directory, data["filename"]
-                )
-                logging.info(file_to_open)
-                open_file(file_to_open)
+        db_document = (
+            session.query(db_models.Document)
+            .filter_by(bot_context_id=self.id, id=document_id)
+            .first()
+        )
+        if db_document is None:
+            raise ValueError(f"Document with id {document_id} not found.")
+        open_file(
+            os.path.join(self.documents_directory, db_document.storage_name)
+        )
 
     def write_chat_history(self, chat_history: dict) -> None:
         """Write a message to the bot's chat history."""
-        with open(self.chat_history_file, "r") as chat_history_file:
-            chat_history_list = json.load(chat_history_file)
-        chat_history_list.append(chat_history)
-        with open(self.chat_history_file, "w") as chat_history_file:
-            json.dump(chat_history_list, chat_history_file)
+        chat_history_text = json.dumps(chat_history)
+        db_chat_chunk = db_models.ChatChunk(
+            bot_context_id=self.id, text=chat_history_text
+        )
+        session.add(db_chat_chunk)
+        session.commit()
 
     def get_chat_history(self) -> list:
         """Get the bot's chat history."""
-        with open(self.chat_history_file, "r") as chat_history_file:
-            return json.load(chat_history_file)
+        chat_history = []
+        for db_chat_chunk in (
+            session.query(db_models.ChatChunk)
+            .filter_by(bot_context_id=self.id)
+            .all()
+        ):
+            chat_history.append(json.loads(db_chat_chunk.text))
+        return chat_history
 
     def clear_chat_history(self) -> None:
         """Clear the bot's chat history."""
-        with open(self.chat_history_file, "w") as chat_history_file:
-            json.dump([], chat_history_file)
+        session.query(db_models.ChatChunk).filter_by(
+            bot_context_id=self.id
+        ).delete()
+        session.commit()
 
     def __str__(self) -> str:
         return f"ChatContext(storage_path={self.storage_path})"
