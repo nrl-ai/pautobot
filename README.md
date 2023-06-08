@@ -65,6 +65,12 @@ If so set your archflags during pip install. eg: _ARCHFLAGS="-arch x86_64" pip3 
 python -m pautobot.app
 ```
 
+or just:
+
+```shell
+pautobot
+```
+
 - Go to <http://localhost:5678/> to see the user interface. You can choose one of the two modes:
   - **Chat**
   - **Chat + QA**
@@ -73,13 +79,20 @@ python -m pautobot.app
 
 ## II. Development
 
-### 1. Run your backend
-
-- Python 3.8 or higher.
-- Install the dependencies:
+### 1. Clone the source code
 
 ```shell
-pip install -r requirements.txt
+git clone https://github.com/nrl-ai/pautobot
+cd pautobot
+```
+
+### 2. Run your backend
+
+- Python 3.8 or higher.
+- To install Pautobot from source, from `pautobot` source code directory, run:
+
+```shell
+pip install -e .
 ```
 
 - Run the app:

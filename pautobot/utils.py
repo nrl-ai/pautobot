@@ -1,3 +1,4 @@
+import logging
 import os
 import pathlib
 import platform
@@ -45,11 +46,21 @@ def extract_frontend_dist(static_folder):
     Extract folder frontend/dist from package pautobot
     and put it in the same static folder for serving
     """
-    dist_folder = pkg_resources.resource_filename("pautobot", "frontend-dist")
     if os.path.exists(static_folder):
-        shutil.rmtree(static_folder)
-    pathlib.Path(static_folder).parent.mkdir(parents=True, exist_ok=True)
-    shutil.copytree(dist_folder, static_folder)
+        logging.info(f"Refreshing {static_folder}...")
+        shutil.rmtree(static_folder, ignore_errors=True)
+    dist_folder = pkg_resources.resource_filename("pautobot", "frontend-dist")
+    if os.path.exists(dist_folder):
+        pathlib.Path(static_folder).parent.mkdir(parents=True, exist_ok=True)
+        shutil.copytree(dist_folder, static_folder)
+    if not os.path.exists(static_folder):
+        logging.warning("frontend-dist not found in package pautobot")
+        pathlib.Path(static_folder).mkdir(parents=True, exist_ok=True)
+        with open(os.path.join(static_folder, "index.html"), "w") as f:
+            f.write(
+                "<b>frontend-dist</b> not found in package pautobot. Please run: <code>bash build_frontend.sh</code>"
+            )
+        return
 
 
 def download_file(url, file_path):
@@ -74,9 +85,9 @@ def download_file(url, file_path):
 
         progress_bar.close()
         shutil.move(tmp_file.name, file_path)
-        print("File downloaded successfully.")
+        logging.info("File downloaded successfully.")
     else:
-        print("Failed to download file.")
+        logging.info("Failed to download file.")
 
 
 def download_model(model_type, model_path):
@@ -89,11 +100,11 @@ def download_model(model_type, model_path):
     """
     MODEL_URL = "https://gpt4all.io/models/ggml-gpt4all-j-v1.3-groovy.bin"
     if not os.path.exists(model_path):
-        print("Downloading model...")
+        logging.info("Downloading model...")
         try:
             download_file(MODEL_URL, model_path)
         except Exception as e:
-            print(f"Error while downloading model: {e}")
+            logging.info(f"Error while downloading model: {e}")
             traceback.print_exc()
             exit(1)
-        print("Model downloaded!")
+        logging.info("Model downloaded!")

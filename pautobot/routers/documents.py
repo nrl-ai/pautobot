@@ -30,7 +30,6 @@ async def upload_document(context_id: str, file: UploadFile = File(...)):
         return {"message": "No file sent"}
 
     file_extension = os.path.splitext(file.filename)[1]
-    print(file_extension)
     if file_extension == ".zip":
         tmp_dir = tempfile.mkdtemp()
         tmp_zip_file = os.path.join(tmp_dir, file.filename)
@@ -41,14 +40,17 @@ async def upload_document(context_id: str, file: UploadFile = File(...)):
         for filename in os.listdir(tmp_dir):
             if os.path.splitext(filename)[1] in SUPPORTED_DOCUMENT_TYPES:
                 with open(os.path.join(tmp_dir, filename), "rb") as file:
-                    globals.context_manager.get_context(context_id).add_document(
-                        file, filename
-                    )
+                    globals.context_manager.get_context(
+                        context_id
+                    ).add_document(file, filename)
         return {"message": "File uploaded"}
     elif file_extension in SUPPORTED_DOCUMENT_TYPES:
-        globals.context_manager.get_context(context_id).add_document(file.file, file.filename)
+        globals.context_manager.get_context(context_id).add_document(
+            file.file, file.filename
+        )
         return {"message": "File uploaded"}
     raise Exception("Unsupported file type")
+
 
 @router.delete("/{context_id}/documents/{document_id}")
 async def delete_document(context_id: str, document_id: str):

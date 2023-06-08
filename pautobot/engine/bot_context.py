@@ -1,5 +1,6 @@
 import copy
 import json
+import logging
 import os
 import pathlib
 import shutil
@@ -148,7 +149,7 @@ class BotContext:
                 file_to_open = os.path.join(
                     self.documents_directory, data["filename"]
                 )
-                print(file_to_open)
+                logging.info(file_to_open)
                 open_file(file_to_open)
 
     def write_chat_history(self, chat_history: dict) -> None:

@@ -1,3 +1,4 @@
+import logging
 import os
 
 from pautobot.app_info import DATA_ROOT
@@ -48,8 +49,8 @@ class PautoBotEngine:
         try:
             self.ingest_documents()
         except Exception as e:
-            print(f"Error while initializing retriever: {e}")
-            print("Switching to chat mode...")
+            logging.info(f"Error while initializing retriever: {e}")
+            logging.info("Switching to chat mode...")
             self.qa_instance_error = "Error while initializing retriever!"
 
     def ingest_documents(self, context_id=None) -> None:
@@ -101,7 +102,7 @@ class PautoBotEngine:
         if mode is None:
             mode = self.mode
         if mode == BotMode.QA.value and self.qa_instance is None:
-            print(self.qa_instance_error)
+            logging.info(self.qa_instance_error)
             mode = BotMode.CHAT
         self.context.current_answer = {
             "status": BotStatus.THINKING,
@@ -116,8 +117,8 @@ class PautoBotEngine:
         )
         if mode == BotMode.QA.value:
             try:
-                print("Received query: ", query)
-                print("Searching...")
+                logging.info("Received query: ", query)
+                logging.info("Searching...")
                 res = self.qa_instance(query)
                 answer, docs = (
                     res["result"],
@@ -138,7 +139,7 @@ class PautoBotEngine:
                 }
                 self.context.write_chat_history(self.context.current_answer)
             except Exception as e:
-                print("Error during thinking: ", e)
+                logging.info("Error during thinking: ", e)
                 answer = "Error during thinking! Please try again."
                 if "Index not found" in str(e):
                     answer = "Index not found! Please ingest documents first."
@@ -150,10 +151,10 @@ class PautoBotEngine:
                 self.context.write_chat_history(self.context.current_answer)
         else:
             try:
-                print("Received query: ", query)
-                print("Thinking...")
+                logging.info("Received query: ", query)
+                logging.info("Thinking...")
                 answer = self.chatbot_instance.predict(human_input=query)
-                print("Answer: ", answer)
+                logging.info("Answer: ", answer)
                 self.context.current_answer = {
                     "status": BotStatus.READY,
                     "answer": answer,
@@ -161,7 +162,7 @@ class PautoBotEngine:
                 }
                 self.context.write_chat_history(self.context.current_answer)
             except Exception as e:
-                print("Error during thinking: ", e)
+                logging.info("Error during thinking: ", e)
                 self.context.current_answer = {
                     "status": BotStatus.READY,
                     "answer": "Error during thinking! Please try again.",

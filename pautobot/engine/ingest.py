@@ -1,4 +1,5 @@
 import glob
+import logging
 import os
 from multiprocessing import Pool
 from typing import List
@@ -114,17 +115,19 @@ def process_documents(
     """
     Load documents and split in chunks
     """
-    print(f"Loading documents from {source_directory}")
+    logging.info(f"Loading documents from {source_directory}")
     documents = load_documents(source_directory, ignored_files)
     if not documents:
-        print("No new documents to load")
+        logging.info("No new documents to load")
         return []
-    print(f"Loaded {len(documents)} new documents from {source_directory}")
+    logging.info(
+        f"Loaded {len(documents)} new documents from {source_directory}"
+    )
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=chunk_size, chunk_overlap=chunk_overlap
     )
     texts = text_splitter.split_documents(documents)
-    print(
+    logging.info(
         f"Split into {len(texts)} chunks of text "
         f"(max. {chunk_size} tokens each)"
     )
@@ -167,7 +170,9 @@ def ingest_documents(
 
     if does_vectorstore_exist(persist_directory):
         # Update and store locally vectorstore
-        print(f"Appending to existing vectorstore at {persist_directory}")
+        logging.info(
+            f"Appending to existing vectorstore at {persist_directory}"
+        )
         db = Chroma(
             persist_directory=persist_directory,
             embedding_function=embeddings,
@@ -179,18 +184,18 @@ def ingest_documents(
             [metadata["source"] for metadata in collection["metadatas"]],
         )
         if not texts:
-            print("No new documents to load")
+            logging.info("No new documents to load")
             return
-        print("Creating embeddings. May take some minutes...")
+        logging.info("Creating embeddings. May take some minutes...")
         db.add_documents(texts)
     else:
         # Create and store locally vectorstore
-        print("Creating new vectorstore")
+        logging.info("Creating new vectorstore")
         texts = process_documents(source_directory)
         if not texts:
-            print("No new documents to load")
+            logging.info("No new documents to load")
             return
-        print("Creating embeddings. May take some minutes...")
+        logging.info("Creating embeddings. May take some minutes...")
         db = Chroma.from_documents(
             texts,
             embeddings,
@@ -200,4 +205,4 @@ def ingest_documents(
     db.persist()
     db = None
 
-    print("Ingestion complete! You can now query the vectorstore")
+    logging.info("Ingestion complete! You can now query the vectorstore")

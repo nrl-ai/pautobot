@@ -2,6 +2,8 @@ import os
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
+import logging
+
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -14,8 +16,8 @@ from pautobot.utils import extract_frontend_dist
 
 
 def main():
-    print(f"Starting {__appname__}...")
-    print(f"Version: {__version__}")
+    logging.info(f"Starting {__appname__}...")
+    logging.info(f"Version: {__version__}")
     static_folder = os.path.abspath(os.path.join(DATA_ROOT, "frontend-dist"))
     extract_frontend_dist(static_folder)
 
@@ -35,7 +37,9 @@ def main():
     app.include_router(bot.router)
     app.include_router(contexts.router)
     app.include_router(documents.router)
-    app.mount("/", StaticFiles(directory=static_folder, html=True), name="static")
+    app.mount(
+        "/", StaticFiles(directory=static_folder, html=True), name="static"
+    )
 
     uvicorn.run(app, host="0.0.0.0", port=5678, reload=False, workers=1)
 
