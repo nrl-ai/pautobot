@@ -64,44 +64,50 @@ export default function Main() {
             headers: {
               "Content-Type": "application/json",
             },
-          }).then(async (response) => {
-            let data = await response.json();
-            if (!response.ok) {
-              const error = (data && data.message) || response.status;
-              return Promise.reject(error);
-            }
-            if (data.status == "THINKING" && data.answer) {
-              newMessages.pop();
-              newMessages = [
-                ...newMessages,
-                { answer: data.answer, docs: null },
-              ];
-              setMessages(newMessages);
-              scrollMessages();
-            } else if (data.status == "READY") {
-              clearInterval(interval);
-              newMessages.pop();
-              newMessages = [
-                ...newMessages,
-                { answer: data.answer, docs: data.docs },
-              ];
-              setMessages(newMessages);
+          })
+            .then(async (response) => {
+              let data = await response.json();
+              if (!response.ok) {
+                const error = (data && data.message) || response.status;
+                return Promise.reject(error);
+              }
+              if (data.status == "THINKING" && data.answer) {
+                newMessages.pop();
+                newMessages = [
+                  ...newMessages,
+                  { answer: data.answer, docs: null },
+                ];
+                setMessages(newMessages);
+                scrollMessages();
+              } else if (data.status == "READY") {
+                clearInterval(interval);
+                newMessages.pop();
+                newMessages = [
+                  ...newMessages,
+                  { answer: data.answer, docs: data.docs },
+                ];
+                setMessages(newMessages);
+                setThinking(false);
+                scrollMessages();
+              }
+            })
+            .catch((error) => {
+              console.error("There was an error!", error);
+              toast.error(error);
               setThinking(false);
-              scrollMessages();
-            }
-          });
+            });
         }, 2000);
       })
       .catch((error) => {
         console.error("There was an error!", error);
-        toast.error("There was an error!");
+        toast.error(error);
         setThinking(false);
       });
   };
 
   return (
     <>
-      <div className="flex flex-col h-full xl:max-w-[800px] xl:mx-auto max-h-screen overflow-hidden">
+      <div className="flex flex-col h-full max-w-full lg:max-w-[800px] xl:max-w-[1000px] xl:mx-auto max-h-screen overflow-hidden">
         <div
           ref={messagesRef}
           className="mx-2 md:px-5 sm:py-4 pb-8 pt-[50px] rounded-xl mt-8 grow overflow-auto"

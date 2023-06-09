@@ -10,9 +10,9 @@ export default function NewMessage({ onSubmitMessage }) {
         <label htmlFor="chat" className="sr-only">
           Your message
         </label>
-        <div className="flex items-center bg-gray-200 pt-6 rounded-2xl overflow-hidden pb-8 px-2 shadow-lg">
+        <div className="flex items-center bg-gray-100 pt-6 rounded-2xl overflow-hidden pb-8 px-2 border-2">
           <select
-            className="text-lg border border-gray-300 text-gray-900 py-3 rounded-l-2xl ml-4 border-l border-y focus:ring-gray-500 focus:border-gray-500 block w-[200px] px-2 focus:outline-none bg-gray-100"
+            className="text-lg border-gray-500 text-gray-900 py-3 rounded-l-2xl ml-4 border focus:ring-gray-500 focus:border-gray-500 block w-[200px] px-2 focus:outline-none bg-gray-200"
             defaultValue={"CHAT"}
             onChange={(e) => setMode(e.target.value)}
           >
@@ -21,8 +21,8 @@ export default function NewMessage({ onSubmitMessage }) {
           </select>
           <textarea
             rows="1"
-            className="block mr-4 p-2.5 w-full text-lg text-gray-900 bg-white rounded-r-2xl border-gray-300 focus:border focus:ring-gray-500 focus:border-gray-600 focus:outline-none"
-            placeholder="What are you thinking about?..."
+            className="block mr-4 p-2.5 w-full text-lg text-gray-900 bg-white rounded-r-2xl border-gray-500 border-y border-r focus:ring-gray-500 focus:outline-none resize-none overflow-hidden"
+            placeholder="How can I help?..."
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={(e) => {

@@ -43,13 +43,14 @@ async def upload_document(context_id: int, file: UploadFile = File(...)):
                     globals.context_manager.get_context(
                         context_id
                     ).add_document(file, filename)
-        return {"message": "File uploaded"}
     elif file_extension in SUPPORTED_DOCUMENT_TYPES:
         globals.context_manager.get_context(context_id).add_document(
             file.file, file.filename
         )
-        return {"message": "File uploaded"}
-    raise Exception("Unsupported file type")
+    else:
+        raise Exception("Unsupported file type")
+    globals.engine.ingest_documents_in_background(context_id=context_id)
+    return {"message": "File uploaded"}
 
 
 @router.delete("/{context_id}/documents/{document_id}")
@@ -60,7 +61,7 @@ async def delete_document(context_id: int, document_id: int):
     globals.context_manager.get_context(context_id).delete_document(
         document_id
     )
-    globals.engine.ingest_documents(context_id=context_id)
+    globals.engine.ingest_documents_in_background(context_id=context_id)
     return {"message": "Document deleted"}
 
 
@@ -69,7 +70,7 @@ async def ingest_documents(context_id: int):
     """
     Ingest all documents in the bot's context
     """
-    globals.engine.ingest_documents(context_id=context_id)
+    globals.engine.ingest_documents_in_background(context_id=context_id)
     return {"message": "Ingestion finished!"}
 
 

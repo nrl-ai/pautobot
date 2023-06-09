@@ -187,7 +187,6 @@ class BotContext:
             "embeddings_model_name": self.embeddings_model_name,
             "documents_directory": self.documents_directory,
             "search_db_directory": self.search_db_directory,
-            "chat_history_file": self.chat_history_file,
             "chat_files_directory": self.chat_files_directory,
             "info_file": self.info_file,
         }

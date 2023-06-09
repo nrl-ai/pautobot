@@ -1,13 +1,9 @@
 import { toast } from "react-toastify";
-import { useState } from "react";
 
 import { clearChatHistory } from "@/lib/requests/chat";
-import LoadingIcon from "./icons/LoadingIcon";
 
 export default function ModelSelector() {
-  const [ingesting, setIngesting] = useState(false);
   const ingestData = () => {
-    setIngesting(true);
     toast.info("Ingesting your data...");
     fetch("/api/0/documents/ingest", {
       method: "POST",
@@ -22,13 +18,10 @@ export default function ModelSelector() {
           console.log(error);
           return Promise.reject(error);
         }
-        toast.success("All data has been ingested!");
-        setIngesting(false);
       })
       .catch((error) => {
         console.error("There was an error!", error);
-        toast.error("There was an error!");
-        setIngesting(false);
+        toast.error(error);
       });
   };
 
@@ -38,16 +31,13 @@ export default function ModelSelector() {
       <div className="mt-3">
         <button
           className={
-            "w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2" +
-            (ingesting ? " opacity-80" : "")
+            "w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2"
           }
           onClick={() => {
-            if (ingesting) return;
             ingestData();
           }}
         >
           Ingest Data
-          {ingesting ? <LoadingIcon /> : null}
         </button>
         <button
           className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2"

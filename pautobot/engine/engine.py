@@ -1,5 +1,6 @@
 import logging
 import os
+import threading
 import traceback
 
 from pautobot import db_models
@@ -32,6 +33,7 @@ class PautoBotEngine:
                 "No contexts found! Please create  at least one context first."
             )
         self.context = self.context_manager.get_current_context()
+        self.status = BotStatus.READY
 
         # Prepare the LLM
         self.model_n_ctx = 1000
@@ -47,29 +49,58 @@ class PautoBotEngine:
         # Prepare the retriever
         self.qa_instance = None
         self.qa_instance_error = None
+        self.is_ingesting_data = False
         if mode == BotMode.CHAT.value:
             return
-        try:
-            self.ingest_documents()
-        except Exception as e:
-            logging.info(f"Error while initializing retriever: {e}")
-            logging.info("Switching to chat mode...")
-            self.qa_instance_error = "Error while initializing retriever!"
+        self.ingest_documents_in_background()
+
+    def get_bot_info(self) -> dict:
+        """Get the bot's info."""
+        return {
+            "mode": self.mode,
+            "model_type": self.status.value,
+            "qa_instance_error": self.qa_instance_error,
+            "status": self.status.value,
+            "is_ingesting_data": self.is_ingesting_data,
+            "context": self.context.dict(),
+        }
 
     def ingest_documents(self, context_id=None) -> None:
         """Ingest the bot's documents."""
+        if self.is_ingesting_data:
+            logging.warning("Already ingesting data. Skipping...")
+            return
+        self.is_ingesting_data = True
         if context_id is not None:
             self.switch_context(context_id)
-        ingest_documents(
-            self.context.documents_directory,
-            self.context.search_db_directory,
-            self.context.embeddings_model_name,
+        try:
+            ingest_documents(
+                self.context.documents_directory,
+                self.context.search_db_directory,
+                self.context.embeddings_model_name,
+            )
+            # Reload QA
+            self.qa_instance = QAFactory.create_qa(
+                context=self.context,
+                llm=self.llm,
+            )
+        except Exception as e:
+            logging.info(f"Error while ingesting documents: {e}")
+            logging.info("Switching to chat mode...")
+            self.qa_instance_error = "Error while ingesting documents!"
+        finally:
+            self.is_ingesting_data = False
+
+    def ingest_documents_in_background(self, context_id=None) -> None:
+        """Ingest the bot's documents in the background using a thread."""
+        if self.is_ingesting_data:
+            logging.warning("Already ingesting data. Skipping...")
+            return
+        thread = threading.Thread(
+            target=self.ingest_documents,
+            args=(context_id,),
         )
-        # Reload QA
-        self.qa_instance = QAFactory.create_qa(
-            context=self.context,
-            llm=self.llm,
-        )
+        thread.start()
 
     def switch_context(self, context_id: int) -> None:
         """Switch the bot context if needed."""
@@ -94,11 +125,18 @@ class PautoBotEngine:
                 "PautobotEngine was initialized in chat mode! "
                 "Please restart in QA mode."
             )
-        elif mode == BotMode.QA.value and self.qa_instance is None:
-            raise ValueError(self.qa_instance_error)
+        elif mode == BotMode.QA.value and self.is_ingesting_data:
+            raise ValueError(
+                "Pautobot is currently ingesting data! Please wait a few minutes and try again."
+            )
+        elif mode == BotMode.QA.value and self.qa_instance_error is not None:
+            raise ValueError(
+                "Pautobot QA instance is not ready! Please wait a few minutes and try again."
+            )
 
     def query(self, mode, query, context_id=None) -> None:
         """Query the bot."""
+        self.status = BotStatus.THINKING
         if context_id is not None:
             self.switch_context(context_id)
         self.check_query(mode, query)
@@ -108,7 +146,7 @@ class PautoBotEngine:
             logging.info(self.qa_instance_error)
             mode = BotMode.CHAT
         self.context.current_answer = {
-            "status": BotStatus.THINKING,
+            "status": self.status,
             "answer": "",
             "docs": [],
         }
@@ -143,8 +181,9 @@ class PautoBotEngine:
                             "content": document.page_content,
                         }
                     )
+                self.status = BotStatus.READY
                 self.context.current_answer = {
-                    "status": BotStatus.READY,
+                    "status": self.status,
                     "answer": answer,
                     "docs": doc_json,
                 }
@@ -155,8 +194,9 @@ class PautoBotEngine:
                 answer = "Error during thinking! Please try again."
                 if "Index not found" in str(e):
                     answer = "Index not found! Please ingest documents first."
+                self.status = BotStatus.READY
                 self.context.current_answer = {
-                    "status": BotStatus.READY,
+                    "status": self.status,
                     "answer": answer,
                     "docs": None,
                 }
@@ -167,8 +207,9 @@ class PautoBotEngine:
                 logging.info("Thinking...")
                 answer = self.chatbot_instance.predict(human_input=query)
                 logging.info("Answer: ", answer)
+                self.status = BotStatus.READY
                 self.context.current_answer = {
-                    "status": BotStatus.READY,
+                    "status": self.status,
                     "answer": answer,
                     "docs": None,
                 }
@@ -176,8 +217,9 @@ class PautoBotEngine:
             except Exception as e:
                 logging.error("Error during thinking: ", e)
                 traceback.print_exc()
+                self.status = BotStatus.READY
                 self.context.current_answer = {
-                    "status": BotStatus.READY,
+                    "status": self.status,
                     "answer": "Error during thinking! Please try again.",
                     "docs": None,
                 }
