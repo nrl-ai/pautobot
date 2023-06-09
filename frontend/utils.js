@@ -1,3 +1,5 @@
+import { toast } from "react-toastify";
+
 export const openDocument = (document_id) => {
   fetch("/api/0/documents/open_in_file_explorer?document_id=" + document_id, {
     method: "POST",
@@ -20,6 +22,7 @@ export const deleteDocument = (document_id, callbackSuccess, callbackError) => {
     })
     .catch((error) => {
       console.error("There was an error!", error);
+      toast.error(error);
       callbackError();
     });
 };

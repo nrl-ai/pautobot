@@ -38,10 +38,8 @@ export default function ModelSelector() {
         let data = await response.json();
         if (!response.ok) {
           const error = (data && data.message) || response.status;
-          console.log(error);
           return Promise.reject(error);
         }
-        console.log(data);
         setDocuments(data);
       })
       .catch((error) => {
@@ -49,6 +47,32 @@ export default function ModelSelector() {
         toast.error("Error while refetching documents!");
       });
   };
+
+  const [botInfo, setBotInfo] = useState(null);
+  const getBotInfo = () => {
+    fetch("/api/bot_info", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then(async (response) => {
+      let data = await response.json();
+      if (!response.ok) {
+        const error = (data && data.message) || response.status;
+        return Promise.reject(error);
+      }
+      setBotInfo(data);
+    });
+  };
+
+  // Periodically get bot info every 5 seconds
+  useEffect(() => {
+    getBotInfo();
+    const interval = setInterval(() => {
+      getBotInfo();
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     refetchDocuments();
@@ -89,7 +113,7 @@ export default function ModelSelector() {
       })
       .catch((error) => {
         console.error("There was an error!", error);
-        toast.error("There was an error!");
+        toast.error(error);
         setUploading(false);
         refetchDocuments();
       });
@@ -177,6 +201,15 @@ export default function ModelSelector() {
           </tbody>
         </table>
       </div>
+      {botInfo?.is_ingesting_data && (
+        <div className="text-sm text-gray-500 dark:text-gray-400">
+          <span>
+            <span className="font-bold text-orange-400">Note:</span> The bot is
+            currently ingesting data. Please wait until it finishes.
+          </span>
+          <LoadingIcon />
+        </div>
+      )}
       <div className="mt-3">
         <input
           className="hidden"
