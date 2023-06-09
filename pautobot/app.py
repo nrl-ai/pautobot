@@ -14,15 +14,19 @@ from pautobot.database import engine
 from pautobot.routers import bot, contexts, documents
 from pautobot.utils import extract_frontend_dist
 
-models.Base.metadata.create_all(bind=engine)
-
 
 def main():
     logging.info(f"Starting {__appname__}...")
     logging.info(f"Version: {__version__}")
+
+    logging.info("Extracting frontend distribution...")
     static_folder = os.path.abspath(os.path.join(DATA_ROOT, "frontend-dist"))
     extract_frontend_dist(static_folder)
 
+    logging.info("Creating database tables...")
+    models.Base.metadata.create_all(bind=engine)
+
+    logging.info("Starting FastAPI server...")
     globals.init()
 
     app = FastAPI(

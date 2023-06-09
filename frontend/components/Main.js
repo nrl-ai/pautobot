@@ -163,11 +163,7 @@ export default function Main() {
           </div>
         </div>
         <div className="w-full grow-0">
-          <NewMessage
-            onSubmitMessage={(mode, message) => {
-              onSubmitMessage(mode, message);
-            }}
-          />
+          <NewMessage onSubmitMessage={onSubmitMessage} />
           <div className="h-8 bg-white"></div>
         </div>
       </div>
