@@ -1,6 +1,6 @@
 import { toast } from "react-toastify";
 
-import { clearChatHistory } from "@lib/requests/history";
+import { clearChatHistory } from "@/lib/requests/history";
 import { ingestData } from "@/lib/requests/documents";
 
 export default function ModelSelector() {

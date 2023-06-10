@@ -1,4 +1,4 @@
-import "@styles/globals.css";
+import "@/styles/globals.css";
 import "react-toastify/dist/ReactToastify.css";
 
 import { Bai_Jamjuree } from "next/font/google";

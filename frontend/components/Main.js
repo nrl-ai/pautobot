@@ -5,7 +5,7 @@ import NewMessage from "./NewMessage";
 
 import { getChatHistory } from "@/lib/requests/history";
 import { ask, queryBotResponse } from "@/lib/requests/bot";
-import { openDocument } from "@lib/requests/documents";
+import { openDocument } from "@/lib/requests/documents";
 
 export default function Main() {
   const [messages, setMessages] = useState([]);
