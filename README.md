@@ -55,8 +55,8 @@ pautobot
 ```
 
 - Go to <http://localhost:5678/> to see the user interface. You can choose one of the two modes:
-  - **Chat**
-  - **Chat + QA**
+  - **Chat Only**
+  - **Documents Q&A**
 - Upload some documents to the app (see the supported extensions above). You can try [docs/python3.11.3_lite.zip](docs/python3.11.3_lite.zip) for a quick start. This zip file contains 45 files from the [Python 3.11.3 documentation](https://docs.python.org/3/download.html).
 - Force ingesting documents with **Ingest Data** button.
 
