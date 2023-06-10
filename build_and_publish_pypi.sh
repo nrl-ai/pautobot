@@ -1,3 +1,4 @@
 #!/bin/sh
-bash build_frontend.sh
-python -m build --sdist --wheel . && twine upload dist/* --skip-existing
+set -e
+bash build.sh
+python -m twine upload --repository pypi dist/* --skip-existing
