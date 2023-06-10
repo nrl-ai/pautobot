@@ -1,4 +1,4 @@
-from langchain.llms import GPT4All, LlamaCpp
+from langchain.llms import GPT4All
 
 from pautobot.utils import download_model
 
@@ -14,14 +14,7 @@ class LLMFactory:
         download_model(model_type, model_path)
 
         # Prepare the LLM
-        if model_type == "LlamaCpp":
-            return LlamaCpp(
-                model_path=model_path,
-                n_ctx=model_n_ctx,
-                streaming=streaming,
-                verbose=verbose,
-            )
-        elif model_type == "GPT4All":
+        if model_type == "GPT4All":
             return GPT4All(
                 model=model_path,
                 n_ctx=model_n_ctx,
@@ -29,3 +22,5 @@ class LLMFactory:
                 streaming=streaming,
                 verbose=verbose,
             )
+        else:
+            raise ValueError(f"Invalid model type: {model_type}")
