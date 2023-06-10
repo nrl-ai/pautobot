@@ -1,3 +1,4 @@
+import argparse
 import logging
 import os
 
@@ -16,6 +17,32 @@ from pautobot.utils import extract_frontend_dist
 
 
 def main():
+    parser = argparse.ArgumentParser(
+        description=__description__,
+    )
+    parser.add_argument(
+        "--host",
+        type=str,
+        default="127.0.0.1",
+        help="Host to run the server on",
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=5678,
+        help="Port to run the server on",
+    )
+    parser.add_argument(
+        "--version",
+        action="store_true",
+        help="Print version and exit",
+    )
+    args = parser.parse_args()
+
+    if args.version:
+        print(f"{__appname__} v{__version__}")
+        return
+
     logging.info(f"Starting {__appname__}...")
     logging.info(f"Version: {__version__}")
 
@@ -48,7 +75,7 @@ def main():
         "/", StaticFiles(directory=static_folder, html=True), name="static"
     )
 
-    uvicorn.run(app, host="0.0.0.0", port=5678, reload=False, workers=1)
+    uvicorn.run(app, host=args.host, port=args.port, reload=False, workers=1)
 
 
 if __name__ == "__main__":

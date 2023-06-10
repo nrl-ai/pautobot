@@ -75,7 +75,13 @@ pautobot
   - **Chat**
   - **Chat + QA**
 - Upload some documents to the app (see the supported extensions above). You can try [docs/python3.11.3_lite.zip](docs/python3.11.3_lite.zip) for a quick start. This zip file contains 45 files from the [Python 3.11.3 documentation](https://docs.python.org/3/download.html).
-- Ingest documents with **Ingest Data** button.
+- Force ingesting documents with **Ingest Data** button.
+
+You can also run PAutoBot publicly to your network or change the port with parameters. Example:
+
+```shell
+pautobot --host 0.0.0.0 --port 8080
+```
 
 ## II. Development
 
