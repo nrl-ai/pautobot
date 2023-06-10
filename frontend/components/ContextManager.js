@@ -15,9 +15,6 @@ export default function ModelSelector() {
           onClick={() => {
             toast.info("Ingesting data...");
             ingestData(0)
-              .then(() => {
-                toast.success("All data has been ingested!");
-              })
               .catch((error) => {
                 toast.error(error);
               });

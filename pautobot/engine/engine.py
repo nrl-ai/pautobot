@@ -85,8 +85,8 @@ class PautoBotEngine:
                 llm=self.llm,
             )
         except Exception as e:
-            logging.info(f"Error while ingesting documents: {e}")
-            logging.info("Switching to chat mode...")
+            logging.error(f"Error while ingesting documents: {e}")
+            logging.error("Switching to chat mode...")
             self.qa_instance_error = "Error while ingesting documents!"
         finally:
             self.is_ingesting_data = False

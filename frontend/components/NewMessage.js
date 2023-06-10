@@ -1,7 +1,8 @@
 import { useState } from "react";
 
 export default function NewMessage({ onSubmitMessage }) {
-  const [mode, setMode] = useState("CHAT");
+  const defaultMode = "QA";
+  const [mode, setMode] = useState(defaultMode);
   const [message, setMessage] = useState("");
 
   return (
@@ -13,7 +14,7 @@ export default function NewMessage({ onSubmitMessage }) {
         <div className="flex items-center bg-gray-100 pt-6 rounded-2xl overflow-hidden pb-8 px-2 border-2">
           <select
             className="text-lg border-gray-500 text-gray-900 py-3 rounded-l-2xl ml-4 border focus:ring-gray-500 focus:border-gray-500 block w-[200px] px-2 focus:outline-none bg-gray-200"
-            defaultValue={"CHAT"}
+            defaultValue={defaultMode}
             onChange={(e) => setMode(e.target.value)}
           >
             <option value="QA">Documents Q&A</option>

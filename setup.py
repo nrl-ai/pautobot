@@ -35,6 +35,7 @@ def get_install_requires():
         "fastapi==0.96.0",
         "SQLAlchemy==2.0.15",
         "alembic==1.11.1",
+        "sentence_transformers==2.2.2",
         "requests",
     ]
 
