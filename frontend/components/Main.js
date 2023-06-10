@@ -3,7 +3,9 @@ import React, { useState, useRef, useEffect } from "react";
 import { toast } from "react-toastify";
 import NewMessage from "./NewMessage";
 
-import { getChatHistory } from "../lib/requests/chat";
+import { getChatHistory } from "@/lib/requests/history";
+import { ask, queryBotResponse } from "@/lib/requests/bot";
+import { openDocument } from "@lib/requests/documents";
 
 export default function Main() {
   const [messages, setMessages] = useState([]);
@@ -17,7 +19,7 @@ export default function Main() {
   };
 
   useEffect(() => {
-    getChatHistory().then(async (response) => {
+    getChatHistory(0).then(async (response) => {
       let data = await response.json();
       if (!response.ok) {
         const error = (data && data.message) || response.status;
@@ -42,35 +44,12 @@ export default function Main() {
     setMessages(newMessages);
     scrollMessages();
 
-    // Submit to PrivateGPT /api/0/ask
-    fetch("/api/0/ask", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ mode: mode, query: message }),
-    })
-      .then(async (response) => {
-        let data = await response.json();
-        if (!response.ok) {
-          const error = (data && data.message) || response.status;
-          return Promise.reject(error);
-        }
-
+    ask(0, mode, message)
+      .then(async (data) => {
         // Query data from /api/get_answer
         const interval = setInterval(async () => {
-          fetch("/api/0/get_answer", {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          })
-            .then(async (response) => {
-              let data = await response.json();
-              if (!response.ok) {
-                const error = (data && data.message) || response.status;
-                return Promise.reject(error);
-              }
+          queryBotResponse(0)
+            .then(async (data) => {
               if (data.status == "THINKING" && data.answer) {
                 newMessages.pop();
                 newMessages = [
@@ -92,14 +71,12 @@ export default function Main() {
               }
             })
             .catch((error) => {
-              console.error("There was an error!", error);
               toast.error(error);
               setThinking(false);
             });
         }, 2000);
       })
       .catch((error) => {
-        console.error("There was an error!", error);
         toast.error(error);
         setThinking(false);
       });
@@ -138,13 +115,14 @@ export default function Main() {
                             {message.docs.map((doc, index) => {
                               return (
                                 <div key={index}>
-                                  <p
-                                    href={doc.url}
-                                    target="_blank"
-                                    className="text-blue-500"
+                                  <div
+                                    className="text-blue-500 cursor-pointer"
+                                    onClick={() => {
+                                      openDocument(0, doc.source_id);
+                                    }}
                                   >
                                     {doc.source}
-                                  </p>
+                                  </div>
                                   <p className="text-gray-700">{doc.content}</p>
                                 </div>
                               );

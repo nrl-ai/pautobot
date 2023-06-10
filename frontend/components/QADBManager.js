@@ -2,7 +2,13 @@ import { toast } from "react-toastify";
 import { useState, useRef, useEffect } from "react";
 
 import LoadingIcon from "./icons/LoadingIcon";
-import { openDocument, deleteDocument } from "../utils";
+import {
+  openDocument,
+  deleteDocument,
+  getDocuments,
+  uploadDocument,
+} from "@/lib/requests/documents";
+import { getBotInfo } from "@/lib/requests/bot";
 
 export default function ModelSelector() {
   const SUPPORTED_FILE_TYPES = [
@@ -26,56 +32,37 @@ export default function ModelSelector() {
   const [uploading, setUploading] = useState(false);
   const fileInput = useRef(null);
   const [documents, setDocuments] = useState([]);
-
-  const refetchDocuments = () => {
-    fetch("/api/0/documents", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then(async (response) => {
-        let data = await response.json();
-        if (!response.ok) {
-          const error = (data && data.message) || response.status;
-          return Promise.reject(error);
-        }
+  const refetchDocuments = (contextId) => {
+    getDocuments(contextId)
+      .then((data) => {
         setDocuments(data);
       })
       .catch((error) => {
-        console.error("Error while refetching documents!", error);
-        toast.error("Error while refetching documents!");
+        toast.error(error);
       });
   };
+  useEffect(() => {
+    refetchDocuments(0);
+  }, []);
 
   const [botInfo, setBotInfo] = useState(null);
-  const getBotInfo = () => {
-    fetch("/api/bot_info", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }).then(async (response) => {
-      let data = await response.json();
-      if (!response.ok) {
-        const error = (data && data.message) || response.status;
-        return Promise.reject(error);
-      }
-      setBotInfo(data);
-    });
+  const getAndSetBotInfo = () => {
+    getBotInfo()
+      .then((data) => {
+        setBotInfo(data);
+      })
+      .catch((error) => {
+        toast.error(error);
+      });
   };
 
   // Periodically get bot info every 5 seconds
   useEffect(() => {
-    getBotInfo();
+    getAndSetBotInfo();
     const interval = setInterval(() => {
-      getBotInfo();
+      getAndSetBotInfo();
     }, 5000);
     return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    refetchDocuments();
   }, []);
 
   const checkAndRejectFile = (file) => {
@@ -92,30 +79,18 @@ export default function ModelSelector() {
   const uploadFile = (file) => {
     checkAndRejectFile(file);
     setUploading(true);
-    const formData = new FormData();
-    formData.append("file", file);
-    fetch("/api/0/documents", {
-      method: "POST",
-      body: formData,
-    })
+    uploadDocument(0, file)
       .then(async (response) => {
-        let data = await response.json();
-        if (!response.ok) {
-          const error = (data && data.message) || response.status;
-          console.log(error);
-          return Promise.reject(error);
-        }
         toast.success(
-          "File uploaded! Ingest your data again before searching."
+          "File uploaded! Please wait for the data to be ingested."
         );
         setUploading(false);
-        refetchDocuments();
+        refetchDocuments(0);
       })
       .catch((error) => {
-        console.error("There was an error!", error);
         toast.error(error);
         setUploading(false);
-        refetchDocuments();
+        refetchDocuments(0);
       });
   };
 
@@ -143,7 +118,7 @@ export default function ModelSelector() {
                 <td className="pl-2 whitespace-nowrap">
                   <button
                     onClick={() => {
-                      openDocument(document.id);
+                      openDocument(0, document.id);
                     }}
                   >
                     <svg
@@ -167,16 +142,14 @@ export default function ModelSelector() {
                         "Are you sure you want to delete this document?"
                       );
                       if (confirmation) {
-                        deleteDocument(
-                          document.id,
-                          () => {
+                        deleteDocument(0, document.id)
+                          .then((response) => {
                             toast.success("Document deleted!");
-                            refetchDocuments();
-                          },
-                          () => {
-                            toast.error("Error while deleting document!");
-                          }
-                        );
+                            refetchDocuments(0);
+                          })
+                          .catch((error) => {
+                            toast.error(error);
+                          });
                       }
                     }}
                   >

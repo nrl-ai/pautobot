@@ -16,8 +16,8 @@ export default function NewMessage({ onSubmitMessage }) {
             defaultValue={"CHAT"}
             onChange={(e) => setMode(e.target.value)}
           >
+            <option value="QA">Documents Q&A</option>
             <option value="CHAT">Chat</option>
-            <option value="QA">Chat + Q&A</option>
           </select>
           <textarea
             rows="1"

@@ -1,30 +1,9 @@
 import { toast } from "react-toastify";
 
-import { clearChatHistory } from "@/lib/requests/chat";
+import { clearChatHistory } from "@lib/requests/history";
+import { ingestData } from "@/lib/requests/documents";
 
 export default function ModelSelector() {
-  const ingestData = () => {
-    toast.info("Ingesting your data...");
-    fetch("/api/0/documents/ingest", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then(async (response) => {
-        let data = await response.json();
-        if (!response.ok) {
-          const error = (data && data.message) || response.status;
-          console.log(error);
-          return Promise.reject(error);
-        }
-      })
-      .catch((error) => {
-        console.error("There was an error!", error);
-        toast.error(error);
-      });
-  };
-
   return (
     <>
       <div className="text-lg font-bold mt-4">This Context</div>
@@ -34,7 +13,14 @@ export default function ModelSelector() {
             "w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2"
           }
           onClick={() => {
-            ingestData();
+            toast.info("Ingesting data...");
+            ingestData(0)
+              .then(() => {
+                toast.success("All data has been ingested!");
+              })
+              .catch((error) => {
+                toast.error(error);
+              });
           }}
         >
           Ingest Data
@@ -42,7 +28,7 @@ export default function ModelSelector() {
         <button
           className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2"
           onClick={() => {
-            clearChatHistory().then(() => {
+            clearChatHistory(0).then(() => {
               toast.success("Chat history cleared!");
               window.location.reload();
             });
