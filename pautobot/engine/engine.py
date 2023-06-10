@@ -175,9 +175,12 @@ class PautoBotEngine:
                         .filter(db_models.Document.id == document_id)
                         .first()
                     )
+                    if not db_document:
+                        continue
                     doc_json.append(
                         {
                             "source": db_document.name,
+                            "source_id": db_document.id,
                             "content": document.page_content,
                         }
                     )

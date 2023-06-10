@@ -1,7 +1,7 @@
 import Sidebar from "@components/Sidebar";
 import Main from "@components/Main";
 import { ToastContainer } from "react-toastify";
-import SidebarTools from "@components/SidebarTools";
+import SidebarTools from "@components/RightSidebar";
 
 export default function Home() {
   return (

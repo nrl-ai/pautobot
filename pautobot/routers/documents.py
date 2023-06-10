@@ -3,6 +3,7 @@ import tempfile
 import zipfile
 
 from fastapi import APIRouter, File, UploadFile
+from fastapi.responses import JSONResponse
 
 from pautobot import globals
 from pautobot.utils import SUPPORTED_DOCUMENT_TYPES
@@ -48,7 +49,10 @@ async def upload_document(context_id: int, file: UploadFile = File(...)):
             file.file, file.filename
         )
     else:
-        raise Exception("Unsupported file type")
+        return JSONResponse(
+            status_code=400,
+            content={"message": f"File type {file_extension} not supported"},
+        )
     globals.engine.ingest_documents_in_background(context_id=context_id)
     return {"message": "File uploaded"}
 
@@ -58,9 +62,12 @@ async def delete_document(context_id: int, document_id: int):
     """
     Delete a document from the bot's context
     """
-    globals.context_manager.get_context(context_id).delete_document(
-        document_id
-    )
+    try:
+        globals.context_manager.get_context(context_id).delete_document(
+            document_id
+        )
+    except ValueError as e:
+        return JSONResponse(status_code=400, content={"message": str(e)})
     globals.engine.ingest_documents_in_background(context_id=context_id)
     return {"message": "Document deleted"}
 
@@ -74,7 +81,7 @@ async def ingest_documents(context_id: int):
     return {"message": "Ingestion finished!"}
 
 
-@router.post("/{context_id}/documents/open_in_file_explorer")
+@router.post("/{context_id}/documents/{document_id}/open_in_file_explorer")
 async def open_in_file_explorer(context_id: int, document_id: int):
     """
     Open the bot's context in the file explorer
