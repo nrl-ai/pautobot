@@ -91,19 +91,21 @@ def download_file(url, file_path):
 
 
 DEFAULT_MODEL_URLS = {
+    "ggml-gpt4all-j": "https://gpt4all.io/models/ggml-gpt4all-j.bin",
+    "ggml-gpt4all-j-v1.1-breezy": "https://gpt4all.io/models/ggml-gpt4all-j-v1.1-breezy.bin",
+    "ggml-gpt4all-j-v1.2-jazzy": "https://gpt4all.io/models/ggml-gpt4all-j-v1.2-jazzy.bin",
     "ggml-gpt4all-j-v1.3-groovy": "https://gpt4all.io/models/ggml-gpt4all-j-v1.3-groovy.bin",
-    "ggml-gpt4all-113b-snoozy": "https://gpt4all.io/models/ggml-gpt4all-113b-snoozy.bin",
-    "ggml-mpt-7b-chat": "https://gpt4all.io/models/ggml-mpt-7b-chat.bin",
-    "ggml-v3-13b-hermes-q5_1": "https://gpt4all.io/models/ggml-v3-13b-hermes-q5_1.bin",
-    "ggml-vicuna-7b-1.1-q4_2": "https://gpt4all.io/models/ggml-vicuna-7b-1.1-q4_2.bin",
-    "ggml-vicuna-13b-1.1-q4_2": "https://gpt4all.io/models/ggml-vicuna-13b-1.1-q4_2.bin",
-    "ggml-wizardLM-7B.q4_2": "https://gpt4all.io/models/ggml-wizardLM-7B.q4_2.bin",
-    "ggml-stable-vicuna-13B.q4_2": "https://gpt4all.io/models/ggml-stable-vicuna-13B.q4_2.bin",
+    "ggml-gpt4all-l13b-snoozy": "https://gpt4all.io/models/ggml-gpt4all-l13b-snoozy.bin",
     "ggml-mpt-7b-base": "https://gpt4all.io/models/ggml-mpt-7b-base.bin",
-    "ggml-nous-gpt4-vicuna-13b": "https://gpt4all.io/models/ggml-nous-gpt4-vicuna-13b.bin",
     "ggml-mpt-7b-instruct": "https://gpt4all.io/models/ggml-mpt-7b-instruct.bin",
+    "ggml-nous-gpt4-vicuna-13b": "https://gpt4all.io/models/ggml-nous-gpt4-vicuna-13b.bin",
+    "ggml-replit-code-v1-3b": "https://huggingface.co/nomic-ai/ggml-replit-code-v1-3b/resolve/main/ggml-replit-code-v1-3b.bin",
+    "ggml-stable-vicuna-13B.q4_2": "https://gpt4all.io/models/ggml-stable-vicuna-13B.q4_2.bin",
+    "ggml-v3-13b-hermes-q5_1": "https://huggingface.co/eachadea/ggml-nous-hermes-13b/resolve/main/ggml-v3-13b-hermes-q5_1.bin",
+    "ggml-vicuna-13b-1.1-q4_2": "https://gpt4all.io/models/ggml-vicuna-13b-1.1-q4_2.bin",
+    "ggml-vicuna-7b-1.1-q4_2": "https://gpt4all.io/models/ggml-vicuna-7b-1.1-q4_2.bin",
     "ggml-wizard-13b-uncensored": "https://gpt4all.io/models/ggml-wizard-13b-uncensored.bin",
-    "ggml-replit-code-v1-3b": "https://gpt4all.io/models/ggml-replit-code-v1-3b.bin",
+    "ggml-wizardLM-7B.q4_2": "https://gpt4all.io/models/ggml-wizardLM-7B.q4_2.bin",
 }
 
 
