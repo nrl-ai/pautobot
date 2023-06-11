@@ -10,7 +10,7 @@ import {
 } from "@/lib/requests/documents";
 import { getBotInfo } from "@/lib/requests/bot";
 
-export default function ModelSelector() {
+export default function QADBManager() {
   const SUPPORTED_FILE_TYPES = [
     ".csv",
     ".docx",

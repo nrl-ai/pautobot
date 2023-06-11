@@ -90,6 +90,22 @@ def download_file(url, file_path):
         logging.info("Failed to download file.")
 
 
+DEFAULT_MODEL_URLS = {
+    "ggml-gpt4all-j-v1.3-groovy": "https://gpt4all.io/models/ggml-gpt4all-j-v1.3-groovy.bin",
+    "ggml-gpt4all-113b-snoozy": "https://gpt4all.io/models/ggml-gpt4all-113b-snoozy.bin",
+    "ggml-mpt-7b-chat": "https://gpt4all.io/models/ggml-mpt-7b-chat.bin",
+    "ggml-v3-13b-hermes-q5_1": "https://gpt4all.io/models/ggml-v3-13b-hermes-q5_1.bin",
+    "ggml-vicuna-7b-1.1-q4_2": "https://gpt4all.io/models/ggml-vicuna-7b-1.1-q4_2.bin",
+    "ggml-vicuna-13b-1.1-q4_2": "https://gpt4all.io/models/ggml-vicuna-13b-1.1-q4_2.bin",
+    "ggml-wizardLM-7B.q4_2": "https://gpt4all.io/models/ggml-wizardLM-7B.q4_2.bin",
+    "ggml-stable-vicuna-13B.q4_2": "https://gpt4all.io/models/ggml-stable-vicuna-13B.q4_2.bin",
+    "ggml-mpt-7b-base": "https://gpt4all.io/models/ggml-mpt-7b-base.bin",
+    "ggml-nous-gpt4-vicuna-13b": "https://gpt4all.io/models/ggml-nous-gpt4-vicuna-13b.bin",
+    "ggml-mpt-7b-instruct": "https://gpt4all.io/models/ggml-mpt-7b-instruct.bin",
+    "ggml-wizard-13b-uncensored": "https://gpt4all.io/models/ggml-wizard-13b-uncensored.bin",
+    "ggml-replit-code-v1-3b": "https://gpt4all.io/models/ggml-replit-code-v1-3b.bin",
+}
+
 def download_model(model_type, model_path):
     """
     Download model if not exists
@@ -98,7 +114,7 @@ def download_model(model_type, model_path):
         - Multiple download links
         - Check hash of the downloaded file
     """
-    MODEL_URL = "https://gpt4all.io/models/ggml-gpt4all-j-v1.3-groovy.bin"
+    MODEL_URL = DEFAULT_MODEL_URLS["ggml-gpt4all-j-v1.3-groovy"]
     if not os.path.exists(model_path):
         logging.info("Downloading model...")
         try:

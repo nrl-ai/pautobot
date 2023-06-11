@@ -1,12 +1,15 @@
-import SidebarTopMenu from "./SidebarTopMenu";
 import SidebarBottomMenu from "./SidebarBottomMenu";
+import SidebarTopMenu from "./SidebarTopMenu";
 
 export default function Sidebar() {
   return (
     <>
       <div className="h-full shadow-md">
         <div className="bg-[#007FF4] w-full h-full flex flex-col shadow-lg">
-          <div align="center" className="mb-16 pt-4 px-2 pb-4 grow-0">
+          <div
+            align="center" className="mb-16 pt-4 px-2 pb-4 grow-0"
+            style={{ cursor: 'pointer' }}
+            onClick={() => window.open('https://pautobot.com/', '_blank')}>
             <img
               alt="PAutoBot"
               className="w-10 h-auto mx-auto mb-2 p-2 rotate-logo hover:rotate-0 transition bg-white rounded-md"
