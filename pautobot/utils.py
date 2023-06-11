@@ -106,6 +106,7 @@ DEFAULT_MODEL_URLS = {
     "ggml-replit-code-v1-3b": "https://gpt4all.io/models/ggml-replit-code-v1-3b.bin",
 }
 
+
 def download_model(model_type, model_path):
     """
     Download model if not exists

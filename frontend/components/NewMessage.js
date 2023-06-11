@@ -25,7 +25,7 @@ export default function NewMessage({ onSubmitMessage }) {
       transition: "all 0.1s ease-in-out",
       borderTopLeftRadius: borderRadius,
       borderBottomLeftRadius: borderRadius,
-      borderLeftWidth: borderWidth
+      borderLeftWidth: borderWidth,
     };
 
     Object.assign(textAreaRef.current.style, styles);
