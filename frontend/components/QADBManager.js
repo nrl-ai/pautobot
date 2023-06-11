@@ -12,25 +12,25 @@ import { getBotInfo } from "@/lib/requests/bot";
 
 export default function QADBManager() {
   const SUPPORTED_FILE_TYPES = [
-    "csv",
-    "docx",
-    "doc",
-    "enex",
-    "eml",
-    "epub",
-    "html",
-    "md",
-    "msg",
-    "odt",
-    "pdf",
-    "pptx",
-    "ppt",
-    "txt",
-    "zip",
+    ".csv",
+    ".docx",
+    ".doc",
+    ".enex",
+    ".eml",
+    ".epub",
+    ".html",
+    ".md",
+    ".msg",
+    ".odt",
+    ".pdf",
+    ".pptx",
+    ".ppt",
+    ".txt",
+    ".zip",
   ];
 
-  const [uploading, setUploading] = useState(false);
   const fileInput = useRef(null);
+  const [uploading, setUploading] = useState(false);
   const [documents, setDocuments] = useState([]);
   const refetchDocuments = (contextId) => {
     getDocuments(contextId)
@@ -65,33 +65,56 @@ export default function QADBManager() {
     return () => clearInterval(interval);
   }, []);
 
-  const checkAndRejectFile = (file) => {
+  const isValidFile = (file) => {
     let fileExtension = file.name?.split(".")?.pop();
     fileExtension = fileExtension?.toLowerCase();
-    if (!fileExtension || !SUPPORTED_FILE_TYPES.includes(fileExtension)) {
-      toast.error("Unsupported file type!");
-      fileInput.current.value = "";
-      return true;
+    if (!fileExtension || !SUPPORTED_FILE_TYPES.includes("." + fileExtension)) {
+      return false;
     }
-    return false;
+    return true;
   };
 
-  const uploadFile = (file) => {
-    checkAndRejectFile(file);
+  const uploadFiles = async (files) => {
+    if (!files || files.length == 0) {
+      toast.error("No file selected.");
+      return;
+    }
+
+    // Clone the files array
+    files = [...files];
+
+    // Start uploading
     setUploading(true);
-    uploadDocument(0, file)
-      .then(async (response) => {
-        toast.success(
-          "File uploaded! Please wait for the data to be ingested."
-        );
-        setUploading(false);
-        refetchDocuments(0);
-      })
-      .catch((error) => {
-        toast.error(error);
-        setUploading(false);
-        refetchDocuments(0);
-      });
+
+    let numUploaded = 0;
+    let numFailed = 0;
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      if (!isValidFile(file)) {
+        toast.error("File type not supported: " + file.name);
+        numFailed++;
+        continue;
+      }
+      await uploadDocument(0, file)
+        .then(async (response) => {
+          numUploaded++;
+          refetchDocuments(0);
+        })
+        .catch((error) => {
+          toast.error(error);
+          numFailed++;
+          refetchDocuments(0);
+        });
+    }
+
+    toast.info(
+      "Uploaded " +
+        numUploaded +
+        " file(s). " +
+        (numFailed > 0 ? "Failed to upload " + numFailed + " file(s)." : "")
+    );
+    fileInput.current.value = "";
+    setUploading(false);
   };
 
   return (
@@ -106,7 +129,18 @@ export default function QADBManager() {
           </span>
         )}
       </div>
-      <div className="relative overflow-x-auto sm:rounded-lg max-h-[200px] overflow-auto mb-4">
+      <div
+        className="relative rounded-lg overflow-auto max-h-[200px] mb-4"
+        onDragOver={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+        onDrop={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          uploadFiles(e.dataTransfer.files);
+        }}
+      >
         <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
           <tbody>
             {documents.map((document, key) => (
@@ -188,10 +222,10 @@ export default function QADBManager() {
           className="hidden"
           type="file"
           ref={fileInput}
+          accept={SUPPORTED_FILE_TYPES.join(",")}
+          multiple={true}
           onChange={(e) => {
-            const file = e.target.files[0];
-            uploadFile(file);
-            fileInput.current.value = null;
+            uploadFiles(e.target.files);
           }}
         />
         <button
@@ -204,7 +238,7 @@ export default function QADBManager() {
             fileInput.current.click();
           }}
         >
-          Upload File
+          Upload Files
           {uploading ? <LoadingIcon /> : null}
         </button>
       </div>

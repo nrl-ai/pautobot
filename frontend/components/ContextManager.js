@@ -14,10 +14,9 @@ export default function ModelSelector() {
           }
           onClick={() => {
             toast.info("Ingesting data...");
-            ingestData(0)
-              .catch((error) => {
-                toast.error(error);
-              });
+            ingestData(0).catch((error) => {
+              toast.error(error);
+            });
           }}
         >
           Ingest Data
