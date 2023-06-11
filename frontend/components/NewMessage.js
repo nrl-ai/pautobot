@@ -1,9 +1,35 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function NewMessage({ onSubmitMessage }) {
   const defaultMode = "QA";
   const [mode, setMode] = useState(defaultMode);
   const [message, setMessage] = useState("");
+  const textAreaRef = useRef(null);
+  const MAX_LINES = 5; // Change this value to set the maximum number of lines
+  useEffect(() => {
+    // get number of lines in message
+    const lines = message.split("\n").length;
+
+    if (lines > MAX_LINES) {
+      textAreaRef.current.rows = MAX_LINES;
+      textAreaRef.current.style.overflowY = "auto";
+    } else {
+      textAreaRef.current.rows = lines;
+      textAreaRef.current.style.overflowY = "hidden";
+    }
+
+    const borderRadius = lines > 1 ? "1rem" : "0";
+    const borderWidth = lines > 1 ? "1px" : "0px";
+
+    const styles = {
+      transition: "all 0.1s ease-in-out",
+      borderTopLeftRadius: borderRadius,
+      borderBottomLeftRadius: borderRadius,
+      borderLeftWidth: borderWidth
+    };
+
+    Object.assign(textAreaRef.current.style, styles);
+  }, [message]);
 
   return (
     <>
@@ -25,6 +51,7 @@ export default function NewMessage({ onSubmitMessage }) {
             className="block mr-4 p-2.5 w-full text-lg text-gray-900 bg-white rounded-r-2xl border-gray-500 border-y border-r focus:ring-gray-500 focus:outline-none resize-none overflow-hidden"
             placeholder="How can I help?..."
             value={message}
+            ref={textAreaRef}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
