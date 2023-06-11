@@ -30,7 +30,6 @@ export default function QADBManager() {
   ];
 
   const fileInput = useRef(null);
-  const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [documents, setDocuments] = useState([]);
   const refetchDocuments = (contextId) => {
@@ -92,9 +91,7 @@ export default function QADBManager() {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       if (!isValidFile(file)) {
-        toast.error(
-          "File type not supported: " + file.name
-        );
+        toast.error("File type not supported: " + file.name);
         numFailed++;
         continue;
       }
@@ -132,42 +129,18 @@ export default function QADBManager() {
           </span>
         )}
       </div>
-      <div className="relative rounded-lg overflow-hidden max-h-[200px] mb-4"
-        onDragOver={
-          (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-          }
-        }
-        onDragEnter={
-          (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            setDragging(true);
-          }
-        }
-        onDragLeave={
-          (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            setDragging(false);
-          }
-        }
-        onDrop={
-          (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            uploadFiles(e.dataTransfer.files);
-          }
-        }
+      <div
+        className="relative rounded-lg overflow-auto max-h-[200px] mb-4"
+        onDragOver={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+        onDrop={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          uploadFiles(e.dataTransfer.files);
+        }}
       >
-        {dragging && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-800 bg-opacity-50">
-            <div className="text-gray-500 dark:text-gray-400">
-              Drop files to upload
-            </div>
-          </div>
-        )}
         <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
           <tbody>
             {documents.map((document, key) => (
