@@ -25,8 +25,8 @@
 - `.msg`: Outlook Message,
 - `.odt`: Open Document Text,
 - `.pdf`: Portable Document Format (PDF),
-- `.pptx` : PowerPoint Document,
-- `.ppt` : PowerPoint Document,
+- `.pptx`: PowerPoint Document,
+- `.ppt`: PowerPoint Document,
 - `.txt`: Text file (UTF-8),
 
 ## I. Installation and Usage
