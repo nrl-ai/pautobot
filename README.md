@@ -6,7 +6,6 @@
 
 - 🔥 **Chat** to your offline **LLMs on CPU Only**. **100% private**, no data leaves your execution environment at any point.
 - 🔥 **Ask questions** to your documents without an internet connection. Engine developed based on [PrivateGPT](https://github.com/imartinez/privateGPT).
-- 🔥 **Automate tasks** easily with **PAutoBot plugins**. Easy for everyone.
 - 🔥 **Easy coding structure** with **Next.js** and **Python**. Easy to understand and modify.
 - 🔥 **Built with** [LangChain](https://github.com/hwchase17/langchain), [GPT4All](https://github.com/nomic-ai/gpt4all), [Chroma](https://www.trychroma.com/), [SentenceTransformers](https://www.sbert.net/), [PrivateGPT](https://github.com/imartinez/privateGPT).
 
