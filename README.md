@@ -1,3 +1,20 @@
+<!-- Archive notice — top of README, kept short so the original
+project description below stays readable as a historical artifact. -->
+
+> 📦 **Archived (May 2026) — see [`nrl-ai/nom-vn`](https://github.com/nrl-ai/nom-vn) for active work.**
+>
+> PAutoBot was our 2023-era prototype of a private, document-grounded
+> AI assistant. The local-first, on-prem ideas behind it have been
+> rebuilt and extended in [`nom-vn`](https://github.com/nrl-ai/nom-vn) — a Vietnamese-first AI toolkit
+> covering RAG, OCR, document extraction, and (since 2026-05)
+> `nom.compliance` for Vietnam's AI Law 134/2025/QH15.
+>
+> Existing forks and issues remain readable; no further updates will
+> land here. New issues / PRs / questions, please file against
+> `nom-vn`.
+
+---
+
 <p align="center">
   <img alt="PAutoBot" style="width: 128px; max-width: 100%; height: auto;" src="./docs/pautobot.png"/>
   <h1 align="center">🔥 PⒶutoBot 🔥</h1>
